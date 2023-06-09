@@ -1,0 +1,105 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
+# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
+#
+# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
+# ```js
+# module.exports = {
+#   dependencies: {
+#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
+# ```
+flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'suntalk' do
+  config = use_native_modules!
+
+  # 네이버 맵 연동
+  pod 'NMapsMap','3.10.1'
+
+  # Flags change depending on the env values.
+  flags = get_default_flags()
+
+  #2023-05-18 permission setting
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  # 카메라
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  # 위치 정확도
+  pod 'Permission-LocationAccuracy', :path => "#{permissions_path}/LocationAccuracy"
+  # 위치 권한 항상 혀용
+  pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
+  # 항상 or 앱을 사용하는 동안 위치 권한 
+  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse"
+  # 갤러리 접근 권한
+  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
+
+  # 사진 라이브러리에 대한 읽기 또는 쓰기 권한
+  #pod 'Permission-PhotoLibraryAddOnly', :path => "#{permissions_path}/PhotoLibraryAddOnly"
+  #앱 추적 투명성, 기기의 광고 권한
+  #pod 'Permission-AppTrackingTransparency', :path => "#{permissions_path}/AppTrackingTransparency"
+  # 블루투스 
+  #pod 'Permission-BluetoothPeripheral', :path => "#{permissions_path}/BluetoothPeripheral"
+  # 캘린더
+  #pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars"
+  # 주소록
+  #pod 'Permission-Contacts', :path => "#{permissions_path}/Contacts"
+  # 페이스 아이디
+  #pod 'Permission-FaceID', :path => "#{permissions_path}/FaceID"
+  # 미디어 라이브러리 (애플 뮤직 등) 권한
+  #pod 'Permission-MediaLibrary', :path => "#{permissions_path}/MediaLibrary"
+  # 마이크 권한
+  #pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
+  # 모션 권한 
+  #pod 'Permission-Motion', :path => "#{permissions_path}/Motion"
+  # 알림 권한 
+  #pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
+  # 미리 알림에 대한 권한 요청
+  #pod 'Permission-Reminders', :path => "#{permissions_path}/Reminders"
+  # 시리 권한 요청
+  #pod 'Permission-Siri', :path => "#{permissions_path}/Siri"
+  # 음성 인식 서버로 전송 요청
+  #pod 'Permission-SpeechRecognition', :path => "#{permissions_path}/SpeechRecognition"
+  # 인앱 구매 및 앱 스토어와의 상호 작용
+  #pod 'Permission-StoreKit', :path => "#{permissions_path}/StoreKit"
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    # Upcoming versions of React Native may rely on get_default_flags(), but
+    # we make it explicit here to aid in the React Native upgrade process.
+    :hermes_enabled => flags[:hermes_enabled],
+    :fabric_enabled => flags[:fabric_enabled],
+    # Enables Flipper.
+    #
+    # Note that if you have use_frameworks! enabled, Flipper will not work and
+    # you should disable the next line.
+    :flipper_configuration => flipper_config,
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  target 'suntalkTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      # Set `mac_catalyst_enabled` to `true` in order to apply patches
+      # necessary for Mac Catalyst builds
+      :mac_catalyst_enabled => false
+    )
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+  end
+end
