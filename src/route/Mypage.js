@@ -1,11 +1,18 @@
 //------------------------------ MODULE --------------------------------
 import { StyleSheet, Text, View, TouchableOpacity } from  'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useEffect } from 'react';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Mypage(){
     //init
     const navigation = useNavigation();
+    const isFocused = useIsFocused();
+
+    //effect
+    useEffect(() => {
+        if(isFocused) console.log('mypage');
+    }, [isFocused]);
 
     //render
     return(
