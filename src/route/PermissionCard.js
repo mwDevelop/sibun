@@ -18,17 +18,21 @@ export default function PermissionCard(){
 
     //function
     const recursiveReq = (cnt) => {
-        permissionCheck(Platform.OS, permissions[cnt][0]).then((data) => {
-            try{
-                cnt++; 
-                if(cnt >= permissions.length) return navigation.replace("Login");
-                setCardTitle(permissions[cnt][1]);
-                recursiveReq(cnt);
-            }catch(e){
+        try{
+            permissionCheck(Platform.OS, permissions[cnt][0]).then((data) => {
+                try{
+                    cnt++; 
+                    if(cnt >= permissions.length) return navigation.replace("Login");
+                    setCardTitle(permissions[cnt][1]);
+                    recursiveReq(cnt);
+                }catch(e){
+                    return;
+                }
                 return;
-            }
-            return;
-        });
+            });
+        }catch(e){
+            console.log(e);
+        }
     }
 
     //effect

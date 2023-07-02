@@ -26,8 +26,8 @@ const ContentTab = () => (
         })}
     >
         <Tab.Screen name="홈" component={Home} initialParams={{ icon: "home" }}/>
-        <Tab.Screen name="지도" component={Search} initialParams={{ icon: "map" }}/>
-        <Tab.Screen name="예약" component={Schedule} initialParams={{ icon: "book" }}/>
+        <Tab.Screen name="내주변" component={Search} initialParams={{ icon: "map" }}/>
+        <Tab.Screen name="스케줄" component={Schedule} initialParams={{ icon: "checkbox" }}/>
         <Tab.Screen name="마이페이지" component={Mypage} initialParams={{ icon: "happy" }}/>
     </Tab.Navigator>
 );
