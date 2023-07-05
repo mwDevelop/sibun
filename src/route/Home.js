@@ -2,10 +2,10 @@
 import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { timeToText } from '@/lib'
-import { Slider } from '@/component';
+import { Slider, ModalNavigation } from '@/component';
 import { useState, useMemo } from 'react';
-import { Modal } from  'react-native';
+import { Modal } from 'react-native';
+import { Mypage, Desc } from '@/route';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Home(){
@@ -198,7 +198,7 @@ export default function Home(){
             <StyledHeaderTitle>
                 <StyledHeaderTitleText>SUNTALK</StyledHeaderTitleText>
             </StyledHeaderTitle>
-            <StyledHeaderSub>
+            <StyledHeaderSub onPress={() => setAddrModal(true)}>
                 <StyledHeaderSubText>광진구 중곡동 156-6 <Icon name="caret-down-sharp" /></StyledHeaderSubText>
             </StyledHeaderSub>
             <StyledHeaderSearch onPress={() => setAddrModal(true)}>
@@ -211,7 +211,7 @@ export default function Home(){
         <StyledSection>
             <Slider data={bannerData} size={{iw:320, ih:140, x:95, y:100}} pagination={true} autoplay={true} imageBorder={["10px"]}/>
         </StyledSection>
-    ), [])    
+    ), []);    
 
     const categoryGear = useMemo(() => (
         <StyledSection>
@@ -292,10 +292,10 @@ export default function Home(){
             </StyledSectionHeader>
             <StyledSectionContent>
                 <Slider 
-                    data={shopData2.map((i) => ({img: i.img,custom:recentListTemplate(i)}))} 
-                    size={{iw:200, ih:235, x:90, y:90}} 
-                    imageBorder={["10px", "0px"]} 
-                    boxBorder={["0px", "10px"]} 
+                    data={shopData2.map((i) => ({img: i.img,custom:recentListTemplate(i)}))}
+                    size={{iw:200, ih:235, x:90, y:90}}
+                    imageBorder={["10px", "0px"]}
+                    boxBorder={["0px", "10px"]}
                     shadow={true}
                     loop={false}
                     center={false}
@@ -354,20 +354,33 @@ export default function Home(){
         </StyledSection>
     ), []);
 
-    const addrModalGear = useMemo(() => (
-        <Modal 
-            //addOnGoal={addGoalHandler}
-            //onCancel={() => setAddrModal(false)}
-            visible={addrModal}	
-            animationType="slide"
-        >
-            <StyledAddrModalView>
-                <StyledAddrModalCancel onPress={() => setAddrModal(false)}>
-                    <StyledHighLight>test</StyledHighLight>
-                </StyledAddrModalCancel>
-            </StyledAddrModalView>
-        </Modal>
-    ));
+    const addrModalGear = useMemo(() => {
+        const pages = {
+            "desc" : Desc,
+            "mypage" : Mypage,
+        };
+        return (
+            addrModal ? 
+            <>
+                <StyledAddrModalBackground opacity="0.5"/>
+                <Modal
+                    //addOnGoal={addGoalHandler}
+                    //onCancel={() => setAddrModal(false)}
+                    visible={addrModal}	
+                    transparent={true}
+                    animationType="slide"
+                >
+                    <StyledAddrModalBackground onPress={() => setAddrModal(false)}/>
+                    <StyledAddrModalClose onPress={() => setAddrModal(false)} >
+                        <StyledAddrModalCloseButton/>
+                    </StyledAddrModalClose>
+                    <StyledAddrModalView>
+                        <ModalNavigation pages={pages}/>
+                    </StyledAddrModalView>
+                </Modal> 
+            </> : null
+        )
+    }, [addrModal]);
 
     //render
     return(
@@ -387,7 +400,7 @@ export default function Home(){
             </StyledConatainer>
             {addrModalGear}
         </StyledWindow>
-    )
+    );
 }
 
 //------------------------------- STYLE --------------------------------
@@ -536,11 +549,32 @@ const StyledNowTemplateSeat = styled.Text`
     font-size:12px;
     color:#777;
 `;
-const StyledAddrModalView = styled.View`
+const StyledAddrModalBackground = styled.TouchableOpacity`
+    position:absolute;
     height:100%;
-    align-items:center;
-    justify-content:center;
+    width:100%;
+    background:rgba(0, 0, 0, ${(props) => props.opacity || '0' });
 `;
-const StyledAddrModalCancel = styled.TouchableOpacity`
+const StyledAddrModalView = styled.View`
+    flex:1;
+    background:white;
+    margin-top:100px;
+    border-top-left-radius:50px;
+    border-top-right-radius:50px;
+    overflow: hidden;
+`;
+const StyledAddrModalClose = styled.TouchableOpacity`
+    top:100px;
+    height:25px;
+    width:100px;
+    justify-content:center;
+    align-items:center;
+    margin:auto;
+`;
+const StyledAddrModalCloseButton = styled.View`
     height:20px;
+    background:white;
+    width:50px;
+    height:5px;
+    border-radius:50px  
 `;
