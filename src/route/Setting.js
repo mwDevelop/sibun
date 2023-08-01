@@ -1,15 +1,16 @@
 //------------------------------ MODULE --------------------------------
-import { StyleSheet, Text, View } from  'react-native';
-import { useEffect } from 'react';
-import { useIsFocused } from '@react-navigation/native';
+import { StyleSheet, Text, View, TouchableOpacity } from  'react-native';
+import { useLayoutEffect } from 'react';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Setting(){
     //init
     const isFocused = useIsFocused();
+    const navigation = useNavigation();
 
     //effect
-    useEffect(()=>{
+    useLayoutEffect(()=>{
         if(isFocused) console.log('setting');
     }, [isFocused]);
 
@@ -17,6 +18,11 @@ export default function Setting(){
     return(
         <View style={styles.container}>
             <Text>Setting</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Desc")}>
+                <Text>
+                    desc
+                </Text>
+            </TouchableOpacity>
         </View>
     )
 }

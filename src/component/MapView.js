@@ -22,9 +22,11 @@ export default function MapView(){
             <Marker 
                 coordinate={P0} 
                 image={{uri:"https://picsum.photos/50/50"}}
-                width={50}
-                height={50}
+                width={30}
+                height={30}
                 caption={{
+                    height:20,
+                    width:20,
                     text: "TEST",
                     //align: Align,
                     textSize: 15,

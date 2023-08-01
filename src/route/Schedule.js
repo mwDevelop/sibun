@@ -4,7 +4,7 @@ import { CalendarView } from '@/component';
 import { timeToText } from '@/lib';
 import styled from 'styled-components/native';
 import { useIsFocused } from '@react-navigation/native';
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useLayoutEffect, useRef } from 'react';
 import { koreanDay } from '@/data/constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -200,13 +200,13 @@ export default function Schedule(){
     }
 
     //effect
-    useEffect(() => {
+    useLayoutEffect(() => {
         if(isFocused){
             init();
         } 
     }, [isFocused]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         scrollViewRef.current.scrollTo({ y: 0, animated: true });
     }, [chkDate])
 

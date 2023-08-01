@@ -1,6 +1,18 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
+
+/* .env files connections */
+project.ext.envConfigFiles = [
+    developdebug: "env/.env.develop",
+    developrelease: "env/.env.develop", 
+    productdebug: "env/.env.product",    
+    productrelease: "env/.env.product",
+    anothercustombuild: ".env",
+]
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
+
 import com.android.build.OutputFile
 
 /**
@@ -146,6 +158,15 @@ android {
 
         }
     }
+
+    /* .env files connections */
+    flavorDimensions "version"
+    productFlavors {
+        develop {
+        }
+        product {
+        }
+    }    
 }
 
 dependencies {
@@ -153,6 +174,8 @@ dependencies {
     implementation("com.facebook.react:react-android")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+
+    implementation('com.facebook.fresco:animated-gif:2.5.0')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

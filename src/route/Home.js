@@ -1,130 +1,17 @@
 //------------------------------ MODULE --------------------------------
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Slider, ModalNavigation } from '@/component';
-import { useState, useMemo } from 'react';
-import { Modal } from 'react-native';
-import { Mypage, Desc } from '@/route';
+import { Slider, AddressView } from '@/component';
+import { useState, useLayoutEffect, useMemo } from 'react';
+import { apiCall, openUrl } from '@/lib';
+import FastImage from 'react-native-fast-image';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Home(){
     //init
     const navigation = useNavigation();
-    const bannerData = [
-        {
-            img : "https://picsum.photos/300/200",
-            event : () => navigation.navigate("마이페이지")
-        },
-        {
-            img : "https://picsum.photos/300/200",
-        },
-        {
-            img : "https://picsum.photos/300/200",
-        },
-        {
-            img : "https://picsum.photos/300/200",
-        },
-        {
-            img : "https://picsum.photos/300/200",
-        },
-    ];
-    const shopData = [
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 1",
-            sub: "매장 1 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 2",
-            sub: "매장 2 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 3",
-            sub: "매장 3 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 4",
-            sub: "매장 4 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 5",
-            sub: "매장 5 입니다."
-        },
-    ];    
-    const shopData2 = [
-        {
-            img : "https://picsum.photos/400/400",
-            name: "매장 1",
-            addr: "송파대로 75번길",
-            score: "5",
-            total: "30",
-            reserved: "5",
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            name: "매장 2",
-            addr: "강동구 동남로 900-22",
-            score: "3.5",
-            total: "40",
-            reserved: "10",
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            name: "매장 3",
-            addr: "송파대로 75번길",
-            score: "4.5",
-            total: "20",
-            reserved: "10",
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            name: "매장 4",
-            addr: "강동구 동남로 900-22",
-            score: "2.5",
-            total: "40",
-            reserved: "10",
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            name: "매장 5",
-            addr: "송파대로 75번길",
-            score: "5",
-            total: "10",
-            reserved: "5",
-        },
-    ];        
-    const recentData = [
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 1",
-            sub: "매장 1 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 2",
-            sub: "매장 2 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 3",
-            sub: "매장 3 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 4",
-            sub: "매장 4 입니다."
-        },
-        {
-            img : "https://picsum.photos/400/400",
-            title: "매장 5",
-            sub: "매장 5 입니다."
-        },
-    ];    
+    const isFocused = useIsFocused();   
     const mediaData = [
         {
             img : "https://picsum.photos/400/400",
@@ -154,23 +41,60 @@ export default function Home(){
     ];        
 
     //state
-    const [addrModal, setAddrModal] = useState(false);
+    const [ banners, setBanners ] = useState([]);
+    const [ category, setCategory ] = useState([]);
+    const [ visited, setVisited ] = useState([]);
 
     //function
-    const recentListTemplate = (info) => {
+    const initData = async() => {
+        try{
+            //banner
+            const bannerResult = await apiCall.get(`/banner`);      
+            if(bannerResult.data.result === '000'){
+                setBanners(bannerResult.data.list.map(ori => {
+                    let newBanners = {};
+                    newBanners['img'] = ori['bn_img_src'];
+                    newBanners['event'] = () => openUrl(ori['bn_link']);
+                    return newBanners;
+                }));
+            }
+
+            //category
+            const cateResult = await apiCall.get(`/category`);      
+            if(cateResult.data.result === '000') setCategory(cateResult.data.list);
+
+            //shop visited
+            const vistedResult = await apiCall.get(`/store`);      
+            if(vistedResult.data.result === '000') setVisited(vistedResult.data.list);
+        }catch(e){
+            console.log(e);
+        }
+    }
+
+    //effect
+    useLayoutEffect(()=>{
+        if(isFocused){
+            console.log('home');
+            initData();
+        } 
+    }, [isFocused]);
+
+
+    //function
+    const visitedListTemplate = (info) => {
         return (
             <StyledRecentTemplateView>
                 <StyledRecentTemplateName>
-                    {info.name}
+                    {info.store_name}
                 </StyledRecentTemplateName>
                 <StyledRecentTemplateAddr>
-                    {info.addr}
+                    {info.store_addr}
                 </StyledRecentTemplateAddr>
                 <StyledRecentTemplateScore>
-                    {info.score}
+                    {info.store_review_avg}
                 </StyledRecentTemplateScore>
                 <StyledRecentTemplateSeat>
-                    <Icon name="person-outline" color="black"/> {<StyledHighLight>{info.reserved}</StyledHighLight>}/{info.total}
+                    <Icon name="person-outline" color="black"/> {<StyledHighLight>{10}</StyledHighLight>}/{20}
                 </StyledRecentTemplateSeat>
             </StyledRecentTemplateView>
         )
@@ -180,17 +104,22 @@ export default function Home(){
         return (
             <StyledNowTemplateView>
                 <StyledNowTemplateName>
-                    {info.name}
+                    {info.store_name}
                 </StyledNowTemplateName>
                 <StyledNowTemplateAddr>
-                    {info.addr}
+                    {info.store_addr}
                 </StyledNowTemplateAddr>
                 <StyledNowTemplateSeat>
-                <Icon name="person-outline" color="black"/> {<StyledHighLight>{info.reserved}</StyledHighLight>}/{info.total}
+                <Icon name="person-outline" color="black"/> {<StyledHighLight>{10}</StyledHighLight>}/{20}
                 </StyledNowTemplateSeat>
             </StyledNowTemplateView>
         )
     }    
+
+    const openModal = () => {
+        const component = <AddressView/>;
+        navigation.navigate("ModalGroup",  {component});
+    }
 
     //memo
     const headerGear = useMemo(() => (
@@ -198,20 +127,20 @@ export default function Home(){
             <StyledHeaderTitle>
                 <StyledHeaderTitleText>SUNTALK</StyledHeaderTitleText>
             </StyledHeaderTitle>
-            <StyledHeaderSub onPress={() => setAddrModal(true)}>
+            <StyledHeaderSub onPress={() => openModal()}>
                 <StyledHeaderSubText>광진구 중곡동 156-6 <Icon name="caret-down-sharp" /></StyledHeaderSubText>
             </StyledHeaderSub>
-            <StyledHeaderSearch onPress={() => setAddrModal(true)}>
+            <StyledHeaderSearch onPress={() => openModal()}>
                 <StyledHeaderSearchIcon name ="md-search-outline"/>
             </StyledHeaderSearch>
         </StyledHeader>
     ), []);
 
-    const bannerGear = useMemo(() => (
+    const bannerGear = useMemo(() => banners.length ? (
         <StyledSection>
-            <Slider data={bannerData} size={{iw:320, ih:140, x:95, y:100}} pagination={true} autoplay={true} imageBorder={["10px"]}/>
+            <Slider data={banners} size={{iw:350, ih:150, x:95, y:100}} pagination={true} autoplay={true} imageBorder={["10px"]}/>
         </StyledSection>
-    ), []);    
+    ): null, [banners]);
 
     const categoryGear = useMemo(() => (
         <StyledSection>
@@ -228,6 +157,22 @@ export default function Home(){
                 </StyledSectionRear>                                 
             </StyledSectionHeader>
             <StyledSectionContent>
+                <StyledCategoryRow>
+                    {
+                    category.length ? (
+                        category.map((item, index) => (
+                            <StyledCategoryItems key={index}  onPress={() => navigation.navigate("마이페이지")}>
+                                <StyledCategoryIconView><StyledCategoryImg source={{uri:item.ctg_icon_img, priority: FastImage.priority.normal}}/></StyledCategoryIconView>
+                                <StyledCategoryText>{item.ctg_title}</StyledCategoryText>
+                            </StyledCategoryItems>
+                        ))
+                    )
+                    :null
+                    }
+                </StyledCategoryRow>
+                
+                {
+                /* 
                 <StyledCategoryRow>
                     <StyledCategoryItems onPress={() => navigation.navigate("마이페이지")}>
                         <StyledCategoryIconView><StyledCategoryIcon name="golf"/></StyledCategoryIconView>
@@ -271,12 +216,15 @@ export default function Home(){
                         <StyledCategoryIconView><StyledCategoryIcon name="bicycle" color="green"/></StyledCategoryIconView>
                         <StyledCategoryText>자전거</StyledCategoryText>
                     </StyledCategoryItems>
-                </StyledCategoryRow>
+                </StyledCategoryRow>                
+                */   
+                }
+
             </StyledSectionContent>                
         </StyledSection>        
-    ), []);
+    ), [category]);
 
-    const recentListGear = useMemo(() => (
+    const visitedListGear = useMemo(() => (
         <StyledSection>
             <StyledSectionHeader>
                 <StyledSectionFront>
@@ -292,8 +240,8 @@ export default function Home(){
             </StyledSectionHeader>
             <StyledSectionContent>
                 <Slider 
-                    data={shopData2.map((i) => ({img: i.img,custom:recentListTemplate(i)}))}
-                    size={{iw:200, ih:235, x:90, y:90}}
+                    data={visited.map((i) => ({img: i.store_main_simg,custom:visitedListTemplate(i)}))}
+                    size={{iw:210, ih:240, x:90, y:90}}
                     imageBorder={["10px", "0px"]}
                     boxBorder={["0px", "10px"]}
                     shadow={true}
@@ -302,7 +250,7 @@ export default function Home(){
                 />
             </StyledSectionContent>
         </StyledSection>   
-    ), []);
+    ), [visited]);
 
     const nowListGear = useMemo(() => (
         <StyledSection>
@@ -321,15 +269,15 @@ export default function Home(){
             </StyledSectionHeader>
             <StyledSectionContent>
                 <Slider
-                    data={shopData2.map((i) => ({img: i.img, custom:nowListTemplate(i)}))}  
+                    data={visited.map((i) => ({img: i.store_main_simg, custom:nowListTemplate(i)}))}  
                     size={{iw:130, ih:200, x:90, y:90}} 
                     imageBorder={["10px"]} 
                     loop={false} 
                     center={false} 
-                    ImageHeight='110px'/>
+                    imageHeight='110px'/>
             </StyledSectionContent>
         </StyledSection>
-    ), []);
+    ), [visited]);
 
     const extraSectionGear = useMemo(() => (
         <StyledSection>
@@ -354,34 +302,6 @@ export default function Home(){
         </StyledSection>
     ), []);
 
-    const addrModalGear = useMemo(() => {
-        const pages = {
-            "desc" : Desc,
-            "mypage" : Mypage,
-        };
-        return (
-            addrModal ? 
-            <>
-                <StyledAddrModalBackground opacity="0.5"/>
-                <Modal
-                    //addOnGoal={addGoalHandler}
-                    //onCancel={() => setAddrModal(false)}
-                    visible={addrModal}	
-                    transparent={true}
-                    animationType="slide"
-                >
-                    <StyledAddrModalBackground onPress={() => setAddrModal(false)}/>
-                    <StyledAddrModalClose onPress={() => setAddrModal(false)} >
-                        <StyledAddrModalCloseButton/>
-                    </StyledAddrModalClose>
-                    <StyledAddrModalView>
-                        <ModalNavigation pages={pages}/>
-                    </StyledAddrModalView>
-                </Modal> 
-            </> : null
-        )
-    }, [addrModal]);
-
     //render
     return(
         <StyledWindow>
@@ -392,13 +312,12 @@ export default function Home(){
                 {/* --------------------- CATEGORY SECTION ---------------------- */}
                 {categoryGear}
                 {/* --------------------- SECTION 2 ---------------------- */}                
-                {recentListGear}
+                {visitedListGear}
                 {/* --------------------- SECTION 3 ---------------------- */}                
                 {nowListGear}
                 {/* --------------------- SECTION 4 ---------------------- */}                
                 {/*extraSection*/}
             </StyledConatainer>
-            {addrModalGear}
         </StyledWindow>
     );
 }
@@ -481,14 +400,18 @@ const StyledCategoryRow = styled.View`
     margin:5px 0 10px 0;
 `;
 const StyledCategoryItems = styled.TouchableOpacity`
-    flex:1;
+    margin-right:20px;
     align-items:center;
     flex-direction:column;
 `;
 const StyledCategoryIconView = styled.View`
-    background:#eee;
+    background:#f1f1f1;
     padding:8px;
     border-radius:8px;
+`;
+const StyledCategoryImg = styled(FastImage)`
+    width:50px;
+    height:50px;  
 `;
 const StyledCategoryIcon = styled(Icon)`
     font-size:30px;
@@ -519,12 +442,15 @@ const StyledRecentTemplateView = styled.View`
     padding:10px;
 `;
 const StyledRecentTemplateName = styled.Text`
-    font-size:20px;
+    font-size:18px;
     font-weight:500;
+    margin: 3px 0;
 `;
 const StyledRecentTemplateAddr = styled.Text`
     font-size:12px;
     color:#777;
+    margin:1px 0;
+    height:20px;
 `;
 const StyledRecentTemplateScore = styled.Text`
     color:#999;
@@ -538,7 +464,7 @@ const StyledNowTemplateView = styled.View`
 `;
 const StyledNowTemplateName = styled.Text`
     font-size:15px;
-    padding:2px 0;
+    padding:5px 0;
 `;
 const StyledNowTemplateAddr = styled.Text`
     font-size:13px;
@@ -548,33 +474,4 @@ const StyledNowTemplateAddr = styled.Text`
 const StyledNowTemplateSeat = styled.Text`
     font-size:12px;
     color:#777;
-`;
-const StyledAddrModalBackground = styled.TouchableOpacity`
-    position:absolute;
-    height:100%;
-    width:100%;
-    background:rgba(0, 0, 0, ${(props) => props.opacity || '0' });
-`;
-const StyledAddrModalView = styled.View`
-    flex:1;
-    background:white;
-    margin-top:100px;
-    border-top-left-radius:50px;
-    border-top-right-radius:50px;
-    overflow: hidden;
-`;
-const StyledAddrModalClose = styled.TouchableOpacity`
-    top:100px;
-    height:25px;
-    width:100px;
-    justify-content:center;
-    align-items:center;
-    margin:auto;
-`;
-const StyledAddrModalCloseButton = styled.View`
-    height:20px;
-    background:white;
-    width:50px;
-    height:5px;
-    border-radius:50px  
 `;

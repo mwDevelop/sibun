@@ -1,6 +1,7 @@
 //----------------------------- FUNCTION -------------------------------
 export default function timeToText(date=new Date(), format='y년 m월 d일 h시 i분 s초'){
     try{
+        if(!date) return null;
         let target = format;
     
         if(target.includes('y')) target = target.replace('y',date.getFullYear());

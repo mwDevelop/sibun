@@ -1,6 +1,6 @@
 //------------------------------ MODULE --------------------------------
 import {LocaleConfig, Calendar} from 'react-native-calendars';
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import {timeToText} from '@/lib'
 import styled from 'styled-components/native';
 import { useIsFocused } from '@react-navigation/native';
@@ -135,7 +135,7 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
     }
 
     //effect
-    useEffect(() => {
+    useLayoutEffect(() => {
         //if(isFocused) init(); //everytime init(dayset, selected refresh) when focused
         init(); 
     }, [/*isFocused*/]);
@@ -146,8 +146,8 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
             style={{
                 borderWidth:0.5,
                 borderColor: '#eee',
-                padding:10,
-                paddingTop:20,
+                padding:5,
+                paddingTop:50,
             }}
             theme={{
                 'stylesheet.calendar.main': {

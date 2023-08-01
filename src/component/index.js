@@ -5,3 +5,5 @@ export { default as CalendarView } from "./CalendarView";
 export { default as ErrorFallback } from "./ErrorFallback";
 export { default as Slider } from "./Slider";
 export { default as ModalNavigation } from "./ModalNavigation";
+export { default as AddressView } from "./AddressView";
+export { default as StopWatch } from "./StopWatch";

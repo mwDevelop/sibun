@@ -11,6 +11,7 @@ import { Alert, Linking } from 'react-native';
         앱사용시허용 -> 다음번 GRANTED 거절시 BLOCKED
         => 따라서 BLOCKED 경우 SETTING으로 리다이렉트
         => DENIED 경우 request 요청
+        * 사진저장소의 경우 제한된 사진 선택의 경우 LIMITED 상태
     ANDOIRD
         허용시 바로 GRANTED
         허용하지 않을 경우 DENIED (but 두번째 요청부터는 request 시 blocked return)
@@ -22,17 +23,20 @@ export default async function permissionCheck(device, type){
         const options = {
             'ios' : {
                 'location' : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-                'camera' : PERMISSIONS.IOS.CAMERA
+                'camera' : PERMISSIONS.IOS.CAMERA,
+                'photo' : PERMISSIONS.IOS.PHOTO_LIBRARY,
             },
             'android' : {
                 'location' : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-                'camera' : PERMISSIONS.ANDROID.CAMERA
+                'camera' : PERMISSIONS.ANDROID.CAMERA,
+                'photo' : PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
             }
         }
     
         const messages = {
             'location' : "주변매장 확인을 위해 위치 권한 허용이 필요합니다.",
-            'camera' : "사진촬영을 위한 카메라 사용 권한 허용이 필요합니다."
+            'camera' : "사진촬영을 위한 카메라 사용 권한 허용이 필요합니다.",
+            'photo' : "사진업로드를 위한 사진 사용 권한 허용이 필요합니다."
         }    
     
         return new Promise((resolve, reject) => {
@@ -51,14 +55,12 @@ export default async function permissionCheck(device, type){
                         {
                             text: "아니오",
                             onPress: () => {
-                                console.log("No Pressed");
                                 resolve('any result');
                             },
                             style: "cancel",
                         },
-                        { cancelable: false }
                     ]
-                );         
+                );
             }
     
             check(options[device][type])
@@ -67,9 +69,9 @@ export default async function permissionCheck(device, type){
                     case RESULTS.DENIED:
                         console.log('The permission has not been requested / is denied but requestable');
                         request(options[device][type]).then((res) => {
-                            if(device == 'android' && res == 'blocked') settingAlert();                            
-                            else resolve('any result');
-                        });
+                            if(device == 'android' && res == 'blocked') settingAlert();
+                            resolve('denied');
+                        }).catch((error) => console.log(error));
                         break;
                     case RESULTS.BLOCKED:
                         console.log('The permission is denied and not requestable anymore');
@@ -77,13 +79,15 @@ export default async function permissionCheck(device, type){
                         break;
                     case RESULTS.UNAVAILABLE:
                         console.log('This feature is not available (on this device / in this context)');
+                        resolve('unavailable');
                         break;
                     case RESULTS.LIMITED:
                         console.log('The permission is limited: some actions are possible');
+                        resolve('limited');
                         break;
                     case RESULTS.GRANTED:
                         console.log('The permission is granted');
-                        resolve('any result');
+                        resolve('granted');
                         break;
                 }
             })

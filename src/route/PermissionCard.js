@@ -1,8 +1,9 @@
 //------------------------------ MODULE --------------------------------
-import { StyleSheet, Text, View, Platform } from 'react-native';
-import { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
+import { useState, useLayoutEffect } from 'react';
 import { permissionCheck } from '@/lib';
 import { useNavigation } from '@react-navigation/native';
+import styled from 'styled-components/native';
 
 //---------------------------- COMPONENT -------------------------------
 export default function PermissionCard(){
@@ -10,7 +11,8 @@ export default function PermissionCard(){
     const navigation = useNavigation();
     const permissions = [
         ['location', '내 주변 즉시방문 가능한 매장을 알려드려요!'],
-        ['camera', '매장 리뷰를 위한 카메라 사용이 필요해요!']
+        ['camera', '매장 리뷰를 위한 카메라 사용이 필요해요!'],
+        ['photo', '사진등록을 위한 저장소 사용이 필요해요!'],
     ]
 
     //state
@@ -36,7 +38,7 @@ export default function PermissionCard(){
     }
 
     //effect
-    useEffect(() => {
+    useLayoutEffect(() => {
         setTimeout(() => {
             recursiveReq(0);
         }, 300);
@@ -44,23 +46,20 @@ export default function PermissionCard(){
 
     //render
     return(
-        <View style={styles.container}>
-            <Text style={styles.text}>{cardTitle}</Text>
-        </View>
+        <StyledConatainer>
+            <StyledHeaderText>{cardTitle}</StyledHeaderText>
+        </StyledConatainer>
     )
 }
 
 //------------------------------- STYLE --------------------------------
-const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor: '#111',
-        padding: '10%'
-    },
-
-    text: {
-        fontWeight: "bold",
-        color: "white",
-        fontSize: 25
-    },
-});
+const StyledConatainer = styled.View`
+    flex:1
+    background:#111;
+    padding:20% 10%;
+`;
+const StyledHeaderText = styled.Text`
+    font-weight:bold;
+    color:#fff;
+    font-size:25px;
+`;

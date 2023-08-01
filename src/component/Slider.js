@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Dimensions } from 'react-native';
 import { useState, useMemo, useRef } from 'react';
+import FastImage from 'react-native-fast-image';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Slider({
@@ -19,7 +20,8 @@ export default function Slider({
     boxBorder=[],
     imageBorder=[],
     shadow=false,
-    ImageHeight=null,
+    imageHeight=null,
+    scrollEnabled=true
 }){
     //init
     const SLIDER_WIDTH = size && 'sw' in size? size.sw : Dimensions.get('window').width + 80;
@@ -64,16 +66,17 @@ export default function Slider({
         <StyledContainer>
             <StyledSlider itemHeight={ITEM_HEIGHT} center={center}>
                 <Carousel
+                    scrollEnabled={scrollEnabled}
                     activeSlideAlignment={center ? "center" : "start"}
                     layout={layout}
                     ref={carouselRef}
                     data={data}
                     inactiveSlideOpacity={inactiveSlideOpacity}
                     renderItem={({item}) => (
-                        <StyledSliderUnit bg={bgColor} shadow={shadow} onPress={ () => {'event' in item ? item.event() : null} }>
+                        <StyledSliderUnit activeOpacity={1} bg={bgColor} shadow={shadow} onPress={ () => {'event' in item ? item.event() : null} }>
                             <StyledSliderBox x={XRATIO} y={YRATIO} boxBorder={boxBorder} shadow={shadow} center={center}>
                                 {'img' in item ? (
-                                    <StyledSliderImage src={item.img} imageBorder={imageBorder} ImageHeight={ImageHeight}/>
+                                    <StyledSliderImage source={{uri:item.img, priority: FastImage.priority.normal}} imageBorder={imageBorder} imageHeight={imageHeight}/>
                                 ) : null}
                                 {'title' in item ? (
                                     <StyledSliderTitle>{item.title}</StyledSliderTitle>
@@ -128,8 +131,8 @@ const StyledSliderBox = styled.View`
     ${(props) => props.boxBorder.length ? (`border-top-right-radius: ${props.boxBorder[0]}; border-top-left-radius: ${props.boxBorder[0]};border-bottom-right-radius: ${props.boxBorder[0]}; border-bottom-left-radius: ${props.boxBorder[0]};`) :null}
     ${(props) => props.boxBorder.length > 1 ? (`border-bottom-right-radius: ${props.boxBorder[1]}; border-bottom-left-radius: ${props.boxBorder[1]};`) :null}
 `;
-const StyledSliderImage = styled.Image`
-    ${(props) => props.ImageHeight ? `height:${props.ImageHeight};` : `flex:1;`}
+const StyledSliderImage = styled(FastImage)`
+    ${(props) => props.imageHeight ? `height:${props.imageHeight};` : `flex:1;`}
     ${(props) => props.imageBorder.length ? (`border-top-right-radius: ${props.imageBorder[0]}; border-top-left-radius: ${props.imageBorder[0]};border-bottom-right-radius: ${props.imageBorder[0]}; border-bottom-left-radius: ${props.imageBorder[0]};`) :null}
     ${(props) => props.imageBorder.length > 1 ? (`border-bottom-right-radius: ${props.imageBorder[1]}; border-bottom-left-radius: ${props.imageBorder[1]};`) :null}
 `;

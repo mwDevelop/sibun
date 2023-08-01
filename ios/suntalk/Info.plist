@@ -2,75 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!--네이버 지도 인증-->
-    <key>NMFClientId</key>
-    <string>5viyn5t38r</string>
-
-	<!-- 카메라 -->
+	<key>NMFClientId</key>
+	<string>5viyn5t38r</string>
 	<key>NSCameraUsageDescription</key>
 	<string>카메라 촬영을 위해 사용 권한 허용이 필요합니다.</string>
-	<!-- 위치 정보 (항상 허용) -->
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>LOCATION ALWAYS</string>
-	<!-- 위치 정보 (항상 허용 & 앱 사용중에만) -->
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>LOCATION (ALWAYS or TEMP)</string>
-	<!-- 위치 정보 (앱이 일시적으로 사용자의 위치 정보에 대한 엑세스 요청하는 이유) -->
 	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
 	<dict>
-	<key>YOUR-PURPOSE-KEY</key>
-	<string>REASON FOR TEMP</string>
+		<key>YOUR-PURPOSE-KEY</key>
+		<string>REASON FOR TEMP</string>
 	</dict>
-	<!-- 위치 정보 (엡 사용중에만) -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>LOCATION WHEN USING</string>
-	<!-- 사진 라이브러리 -->
+	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>PHOTO</string>
-
-	<!--
-	애플 뮤직 (미디어 라이브러리)
-	<key>NSAppleMusicUsageDescription</key> 
-	<string>YOUR TEXT</string>
-	사진 라이브러리 (쓰기 전용 권한)
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>PHOTO WRITE</string>
-	블루투스
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>YOUR TEXT</string>
-	블루투스 인터페이스 접근
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>YOUR TEXT</string>
-	달력
-	<key>NSCalendarsUsageDescription</key>
-	<string>YOUR TEXT</string>
-	연락처
-	<key>NSContactsUsageDescription</key>
-	<string>YOUR TEXT</string>
-	페이스 아이디
-	<key>NSFaceIDUsageDescription</key>
-	<string>YOUR TEXT</string>
-	마이크
-	<key>NSMicrophoneUsageDescription</key>
-	<string>YOUR TEXT</string>
-	모션
-	<key>NSMotionUsageDescription</key>
-	<string>YOUR TEXT</string>
-	미리 알림
-	<key>NSRemindersUsageDescription</key>
-	<string>YOUR TEXT</string>
-	음성 인식
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>YOUR TEXT</string>
-	시리
-	<key>NSSiriUsageDescription</key>
-	<string>YOUR TEXT</string>
-	앱 추적, 기기의 광고 권한
-	<key>NSUserTrackingUsageDescription</key>
-	<string>YOUR TEXT</string>
-	-->
-
-	<!-- VECTOR ICON FONTS -->	
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -90,7 +38,6 @@
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
 	</array>
-
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -115,6 +62,8 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>localhost</key>
@@ -124,8 +73,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

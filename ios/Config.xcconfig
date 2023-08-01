@@ -1,0 +1,10 @@
+//
+//  Config.xcconfig
+//  suntalk
+//
+//  Created by Ethan Kim on 2023/07/12.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+#include? "tmp.xcconfig"
