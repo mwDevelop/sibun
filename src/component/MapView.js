@@ -1,5 +1,7 @@
 //------------------------------ MODULE --------------------------------
 import NaverMapView, { Marker, Path, Polyline, Circle, Polygon } from 'react-native-nmap';
+import { CustomInnerLoading } from '@/component';
+import { map_loading } from '@/assets/animation';
 
 //---------------------------- COMPONENT -------------------------------
 export default function MapView(){
@@ -10,6 +12,8 @@ export default function MapView(){
 
     //render
     return (
+        <>
+        <CustomInnerLoading lottie={map_loading} delay={3000}/>
         <NaverMapView 
             style={{width: '100%', height: '100%'}}
             showsMyLocationButton={true}
@@ -45,7 +49,8 @@ export default function MapView(){
             {/*<Polyline coordinates={[P1, P2]} onClick={() => console.warn('onClick! polyline')}/>*/}
             {/*<Circle coordinate={P0} color={"rgba(255,0,0,0.3)"} radius={200} onClick={() => console.warn('onClick! circle')}/>*/}
             {/*<Polygon coordinates={[P0, P1, P2]} color={`rgba(0, 0, 0, 0.5)`} onClick={() => console.warn('onClick! polygon')}/>*/}
-        </NaverMapView>        
+        </NaverMapView>    
+        </>    
     )
 }
 

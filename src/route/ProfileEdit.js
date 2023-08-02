@@ -11,7 +11,7 @@ import { globalMsg } from '@/data/constants';
 import { ProfileEditSaveAtom } from '@/data/global';
 import { useRecoilState } from "recoil";
 import FastImage from 'react-native-fast-image';
-import { edit_pen } from '@/assets';
+import { edit_pen } from '@/assets/img';
 import ImagePicker from 'react-native-image-crop-picker';
 
 //---------------------------- COMPONENT -------------------------------

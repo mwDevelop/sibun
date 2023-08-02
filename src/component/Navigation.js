@@ -1,6 +1,6 @@
 //------------------------------ MODULE --------------------------------
 import { useState, useLayoutEffect } from 'react';
-import { Text, Image } from 'react-native';
+import { Text, Image, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -28,7 +28,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { TransitionPresets } from '@react-navigation/stack';
 import { ProfileEditSaveAtom } from '@/data/global';
 import { useRecoilState } from "recoil";
-import { home, home_color, search, search_color, schedule, schedule_color, mypage, mypage_color } from '@/assets';
+import { home, home_color, search, search_color, schedule, schedule_color, mypage, mypage_color } from '@/assets/img';
 
 //---------------------------- NAVIGATORS -------------------------------
 const Drawer = createDrawerNavigator();
@@ -124,34 +124,33 @@ const RootStack = () => {
                 ) : null
             }
             {/*************************** LOGIN ******************************/}
-            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Login" component={Login}/>
             <Stack.Screen name="로그인 / 회원가입" component={Join} options={{headerShown:true}}/>
             <Stack.Screen name="JoinSuccess" component={JoinSuccess}/>
             <Stack.Screen name="Welcome" component={Welcome}/>
             <Stack.Screen name="계정찾기" component={FindAccount} options={{headerShown:true}}/>
             {/**************************** TABS ******************************/}
-            <Stack.Screen name="Content" component={ContentTab} />
+            <Stack.Screen name="Content" component={ContentTab}/>
 
             {/**************************** HOME ******************************/}
-            <Stack.Screen name="Desc" component={Desc} />
+            <Stack.Screen name="Desc" component={Desc}/>
             {/**************************** SEARCH ****************************/}
 
             {/*************************** SCHEDULE ***************************/}
 
             {/*************************** MYPAGE *****************************/}
-            <Stack.Screen name="Setting" component={Setting} />
+            <Stack.Screen name="Setting" component={Setting}/>
             <Stack.Screen name="프로필 수정" component={ProfileEdit} options={{headerShown:true, headerRight:() => (<ProfileEditSaveButton/>)}}/>
             {/**************************** MODAL *****************************/}
-            <Stack.Screen 
-                name="ModalGroup" 
-                component={ModalGroup} 
-                
-                options={{        
+            <Stack.Screen
+                name="ModalGroup"
+                component={ModalGroup}
+                options={{
                     gestureEnabled: true,
-                    ...TransitionPresets.ModalPresentationIOS,                    
+                    ...TransitionPresets.ModalPresentationIOS,
                     presentation:'transparentModal',
                 }}
-                />
+            />
         </Stack.Navigator>
     );    
 }
@@ -170,6 +169,7 @@ export default function Navatation(){
     //render
     return(
         <NavigationContainer>
+            <SafeAreaView/>
             <PaperProvider>
                 <RootStack/>
             </PaperProvider>

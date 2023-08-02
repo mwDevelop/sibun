@@ -2,10 +2,11 @@
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Slider, AddressView } from '@/component';
+import { Slider, AddressView, CustomInnerLoading } from '@/component';
 import { useState, useLayoutEffect, useMemo } from 'react';
 import { apiCall, openUrl } from '@/lib';
 import FastImage from 'react-native-fast-image';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //---------------------------- COMPONENT -------------------------------
 export default function Home(){
@@ -71,6 +72,15 @@ export default function Home(){
         }
     }
 
+    const tokenCheck = () => {
+        AsyncStorage.getItem('access', (err, result) => {
+            console.log("ACCESS TOKEN : " + result);
+        });
+        AsyncStorage.getItem('refresh', (err, result) => {
+            console.log("REFRESH TOKEN : " + result);
+        });
+    }
+
     //effect
     useLayoutEffect(()=>{
         if(isFocused){
@@ -125,7 +135,7 @@ export default function Home(){
     const headerGear = useMemo(() => (
         <StyledHeader>
             <StyledHeaderTitle>
-                <StyledHeaderTitleText>SUNTALK</StyledHeaderTitleText>
+                <StyledHeaderTitleText onPress={tokenCheck}>SUNTALK</StyledHeaderTitleText>
             </StyledHeaderTitle>
             <StyledHeaderSub onPress={() => openModal()}>
                 <StyledHeaderSubText>광진구 중곡동 156-6 <Icon name="caret-down-sharp" /></StyledHeaderSubText>
@@ -305,6 +315,7 @@ export default function Home(){
     //render
     return(
         <StyledWindow>
+            <CustomInnerLoading paddingTop="70%"/>
             <StyledConatainer>
                 {headerGear}
                 {/* ------------------- BANNER SECTION -------------------- */}                
@@ -328,7 +339,7 @@ const StyledWindow = styled.ScrollView`
 `;
 const StyledConatainer = styled.View`
     flex-direction:column;
-    margin:50px 15px;
+    margin:20px 15px;
 `;
 const StyledHeader = styled.View`
     flex-direction:row;

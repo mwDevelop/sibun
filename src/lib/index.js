@@ -6,3 +6,5 @@ export { default as timeToText } from "./timeToText";
 export { default as mobileMask } from "./mobileMask";
 export { default as numberFilter } from "./numberFilter";
 export { default as specialCharFilter } from "./specialCharFilter";
+export { default as errorAlert } from "./errorAlert";
+export { default as logout } from "./logout";

@@ -81,8 +81,7 @@ const StyledConatainer = styled.View`
     flex:1;
 `;
 const StyledHeader = styled.View`
-    flex:1;
-    justify-content:flex-end;
+    top:1%;
     align-items:center;
 `;
 const StyledSearchBar = styled.View`
@@ -101,16 +100,15 @@ const StyledSearchBarInput = styled.TextInput`
 `;
 const StyledSearchBarIcon = styled(Icon)`
     flex:0.15;
-    font-size:25;
+    font-size:25px;
     text-align:center;
     color:#333;
 `;
 const StyledBody = styled.View`
-    flex:3;
+    margin:30px 0;
 `;
 const StyledFilterArea = styled.FlatList`
     flex-grow:0;
-    margin-bottom:20px;
 `;
 const StyledFilterItem = styled.TouchableOpacity`
     padding:5px 14px 3.5px 14px;

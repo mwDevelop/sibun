@@ -7,3 +7,5 @@ export { default as Slider } from "./Slider";
 export { default as ModalNavigation } from "./ModalNavigation";
 export { default as AddressView } from "./AddressView";
 export { default as StopWatch } from "./StopWatch";
+export { default as CustomLoading } from "./CustomLoading";
+export { default as CustomInnerLoading } from "./CustomInnerLoading";

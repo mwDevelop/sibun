@@ -56,7 +56,7 @@ export default function PermissionCard(){
 const StyledConatainer = styled.View`
     flex:1
     background:#111;
-    padding:20% 10%;
+    padding:10%;
 `;
 const StyledHeaderText = styled.Text`
     font-weight:bold;

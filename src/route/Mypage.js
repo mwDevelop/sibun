@@ -5,7 +5,8 @@ import FastImage from 'react-native-fast-image';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { review_chat, book_list, star_pick } from '@/assets';
+import { review_chat, book_list, star_pick } from '@/assets/img';
+import { logout } from '@/lib';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Mypage(){
@@ -134,7 +135,7 @@ export default function Mypage(){
                     <StyledFooter>
                         <StyledLogout>
                             <StyledLogoutIcon name="ios-exit-outline"/>
-                            <StyledLogoutText onPress={() => navigation.replace('Login')}> 로그아웃</StyledLogoutText>
+                            <StyledLogoutText onPress={() => logout(() => navigation.replace('Login'))}> 로그아웃</StyledLogoutText>
                         </StyledLogout>
                     </StyledFooter>
             </StyledConatainer>

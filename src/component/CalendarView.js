@@ -147,7 +147,7 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
                 borderWidth:0.5,
                 borderColor: '#eee',
                 padding:5,
-                paddingTop:50,
+                paddingTop:10,
             }}
             theme={{
                 'stylesheet.calendar.main': {

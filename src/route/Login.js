@@ -86,7 +86,7 @@ const StyledTitleSection = styled.View`
 const StyledTitleTextArea = styled.View`
     flex:0.2;
     align-items:center;
-    top:15%;
+    top:5%;
 `;
 const StyledTitleMain = styled.Text`
     font-size:45px;
@@ -146,7 +146,7 @@ const StyledFindAccountText = styled.Text`
 `;
 const StyledFreePass = styled.Text`
     position:absolute;
-    top:15%;
+    top:8%;
     right:8%;
     font-size:14px;
     color:#ccc;

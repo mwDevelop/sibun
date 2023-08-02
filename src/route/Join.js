@@ -5,17 +5,19 @@ import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import DatePicker from 'react-native-date-picker';
-import { timeToText } from '@/lib';
+import { timeToText, errorAlert } from '@/lib';
 import { StopWatch } from '@/component';
 import { globalMsg } from '@/data/constants';
 import { apiCall, mobileMask, numberFilter, specialCharFilter } from '@/lib';
+import uuid from 'react-native-uuid';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //---------------------------- COMPONENT -------------------------------
 export default function Join({route}){
     //init
     const navigation = useNavigation();
     const { page } = route.params;
-    const  joinInfo = page ? route.params.joinInfo : { phoneData : '', nameData : '', genderData : 'm', birthData : ''}; //default datas
+    const relayInfo = page ? route.params.relayInfo : { phoneData : '', nameData : '', genderData : 'm', birthData : '', finalDestination : 'Content'}; //default datas
     const endPage = 2;
     const titleList = [
         "휴대폰번호를\n인증해 주세요",
@@ -27,15 +29,18 @@ export default function Join({route}){
     const nameInput = useRef(null);
 
     //state
-    const [phone, setPhone] = useState(joinInfo.phoneData);
-    const [realPhone, setRealPhone] = useState(joinInfo.phoneData);
+    const [phone, setPhone] = useState(relayInfo.phoneData);
+    const [realPhone, setRealPhone] = useState(relayInfo.phoneData);
     const [pin, setPin] = useState('');
-    const [name, setName] = useState(joinInfo.nameData);
+    const [name, setName] = useState(relayInfo.nameData);
     const [dateModalOpen, setDateModalOpen] = useState(false);
-    const [gender, setGender] = useState(joinInfo.genderData);
-    const [birth, setBirth] = useState(joinInfo.birthData);
-    const [mailFront, setMailFront] = useState(joinInfo.mailFront);
-    const [mailRear, setMailRear] = useState(joinInfo.mailRear);
+    const [gender, setGender] = useState(relayInfo.genderData);
+    const [birth, setBirth] = useState(relayInfo.birthData);
+    const [mailFront, setMailFront] = useState(relayInfo.mailFront);
+    const [mailRear, setMailRear] = useState(relayInfo.mailRear);
+    const [profileImage, setProfileImage] = useState(null);
+    const [marketing, setMarketing] = useState(null);
+    const [finalDestination, setFinalDestination] = useState(relayInfo.finalDestination);
 
     /* status : ready -> refresh -> ing -> (certPass or certFail or certOver ) */
     const [phoneChk, setPhoneChk] = useState('ready'); 
@@ -43,31 +48,66 @@ export default function Join({route}){
 
     //function
     const moveNext = async() => {
-        if(page == endPage){ //the last page
-            console.log({mail:mailFront+"@"+mailRear, ...joinInfo});
-            /* post data to server and make joininig target member ...... */
-            return navigation.replace("JoinSuccess");
-        }
+        try{
+            if(page == endPage){ //the last page
+                console.log({mail:mailFront+"@"+mailRear, ...relayInfo});
+                /* post data to server and make joininig target member ...... */
+                let params = { 
+                    mb_id: uuid.v4().substring(0,18),
+                    mb_passwd: uuid.v4().substring(0,18),
+                    mb_cellphone: realPhone,
+                    mb_name: name,
+                    mb_gender: gender,
+                    mb_email: mailFront+"@"+mailRear,
+                };
+                const joinResult = await apiCall.put('/user', {...params});
 
-        if(page == 0){ //phone chk
-            if(!phone) return setPhoneChk("isNotPhone");
-            if(!realPhone) return setPhoneChk("needCert");
-            if(!pin) return setPhoneChk("isNotCert");
+                if(joinResult.data.result == "000"){
+                    navigation.replace("JoinSuccess");
+                }else{
+                    errorAlert("회원가입 과정에서", () => navigation.replace("Login"));
+                }
+                return;
+            }
+    
+            if(page == 0){ //phone chk
+                if(!phone) return setPhoneChk("isNotPhone");
+                if(!realPhone) return setPhoneChk("needCert");
+                if(!pin) return setPhoneChk("isNotCert");
+    
+                const certResult = await checkCert(realPhone, pin);
+                if(!certResult) return;
 
-            const certResult = await checkCert(realPhone, pin);
-            if(!certResult) return;
+                /* checking the target is member.. */
+                let params = { mb_cellphone: realPhone };
+                const loginTryResult = await apiCall.post('/auth/loginv2', {...params});
+
+                if(loginTryResult.data.result == "000"){ //LOGIN
+                    AsyncStorage.setItem('access', loginTryResult.data.access_token);
+                    AsyncStorage.setItem('refresh', loginTryResult.data.refresh_token);
+                    navigation.replace(finalDestination);
+                    return;
+                }else if(loginTryResult.data.result == "001") console.log("join"); //JOIN
+                else return errorAlert('', () => navigation.replace("Login"));
+            }
+
+            if(page == 1){ //name, birth, gender chk
+                if(!name) return setInfoChk("isNotName");
+                if(!birth) return setInfoChk("isNotBirth");
+            }
+
+            relayObj = {
+                phoneData : realPhone,
+                nameData : name,
+                genderData : gender,
+                birthData : birth,
+                finalDestination : finalDestination,
+            }
+            navigation.replace("로그인 / 회원가입", {page:page+1, relayInfo : relayObj});
+        }catch(e){
+            console.log(e);
+            errorAlert('', () => navigation.replace("Login"));
         }
-        if(page == 1){ //name, birth, gender chk
-            if(!name) return setInfoChk("isNotName");
-            if(!birth) return setInfoChk("isNotBirth");
-        }
-        relayObj = {
-            phoneData : realPhone,
-            nameData : name,
-            genderData : gender,
-            birthData : birth,
-        }
-        navigation.replace("로그인 / 회원가입", {page:page+1, joinInfo : relayObj});   
     }
 
     const sendCert = async(p) => {
