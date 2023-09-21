@@ -3,9 +3,10 @@
 import { useLayoutEffect } from 'react';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
+import { AddressView } from '@/component';
 
 //---------------------------- COMPONENT -------------------------------
-export default function ModalGroup({route}){
+export default function ModalGroup(){
     //init
     const isFocused = useIsFocused();
     const navigation = useNavigation();
@@ -22,7 +23,7 @@ export default function ModalGroup({route}){
         <StyledWindow activeOpacity={1}>
             <StyledWindowCloser/>
             <StyledConatainer activeOpacity={1}>
-                {route.params.component}
+                <AddressView/>
             </StyledConatainer>
         </StyledWindow>
     )

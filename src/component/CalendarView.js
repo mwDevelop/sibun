@@ -19,6 +19,7 @@ LocaleConfig.defaultLocale = 'kr';
 export default function CalendarView({ initDate = null, dateChange = () => {}, scheduleData = [] }){
     //init
     const isFocused = useIsFocused();
+    const monthRange = 3;
 
     //state
     const [selected, setSelected] = useState(null);
@@ -30,10 +31,10 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
             const currentDate = initDate ? initDate : new Date();
 
             const threeMonthsEarlier = new Date();
-            threeMonthsEarlier.setMonth(currentDate.getMonth() - 3);
+            threeMonthsEarlier.setMonth(currentDate.getMonth() - monthRange);
         
             const threeMonthsLater = new Date();
-            threeMonthsLater.setMonth(currentDate.getMonth() + 3);
+            threeMonthsLater.setMonth(currentDate.getMonth() + monthRange);
         
             setDayset({
                 td : currentDate,
@@ -177,6 +178,13 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
             onDayPress={day => {
                 setSelected(day.dateString);
                 dateChange(day.dateString);
+            }}
+            onMonthChange={day => {
+                /*  //set first date when month changed
+                const firstDate = `${day.year}-${day.month < 10 ? '0'+day.month : day.month}-01`;
+                setSelected(firstDate);
+                dateChange(firstDate);
+                */
             }}
             markingType={'custom'}
             markedDates={markDate()}

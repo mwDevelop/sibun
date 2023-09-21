@@ -1,16 +1,15 @@
 //------------------------------ MODULE --------------------------------
-import { permissionCheck } from '@/lib';
-import { useLayoutEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapView } from '@/component';
-import { Platform, FlatList } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useStore } from '@/hooks';
+import { rangeSet } from '@/data/constants';
+import { defaultLocation } from '@/data/constants';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Search(){
     //init
-    const isFocused = useIsFocused();
     const filterTestItem = [
         {
             "title" : "%할인권",
@@ -32,14 +31,67 @@ export default function Search(){
         }
     ]
 
+    //state
+    const [center, setCenter] = useState(defaultLocation);
+    const [params, setParams] = useState({
+        store_addr_x_ge:Number(defaultLocation.longitude) - rangeSet[14][0],
+        store_addr_x_le:Number(defaultLocation.longitude) + rangeSet[14][0],
+        store_addr_y_ge:Number(defaultLocation.latitude) - rangeSet[14][1],
+        store_addr_y_le:Number(defaultLocation.latitude) + rangeSet[14][1],
+    });
 
-    //effect
-    useLayoutEffect(() => {
-        if(isFocused){
-            console.log('Search');
-            permissionCheck(Platform.OS, 'location');
+    //data
+    const [storeList] = useStore(
+        null, 
+        params
+    );
+
+    //memo
+    const mapGear = useMemo(() => {
+        console.log(storeList);
+        const markerData = storeList && storeList.length ? 
+            storeList.map((i) => ({
+                name : i.store_name, 
+                img : i.store_main_simg, 
+                addr : i.store_addr, 
+                reviewAvg : Number(i.store_review_avg), 
+                reviewCnt : Number(i.store_review_cnt), 
+                latitude : Number(i.store_addr_y), 
+                longitude: Number(i.store_addr_x)
+            })) : [];
+
+        return (
+            <StyledBody>
+                <MapView markerData={markerData} onCenterChange={setCenter}/>
+            </StyledBody>
+        );
+    }, [storeList]);
+
+    //effect  
+    useEffect(() => {
+        try{
+            if(!center) return;
+            const range = rangeSet[center.zoom];
+            setParams({  
+                store_addr_x_ge:Number(center.longitude) - range[0],
+                store_addr_x_le:Number(center.longitude) + range[0],
+                store_addr_y_ge:Number(center.latitude) - range[1],
+                store_addr_y_le:Number(center.latitude) + range[1],
+            }); 
+        }catch(e){
+            console.log(e);
         }
-    }, [isFocused]);
+    }, [center]);
+
+    useEffect(() => {
+        if(!storeList) return;
+        console.log("-------OBSERVED LIST------");
+        console.log(storeList.forEach((i) => {
+            console.log("-------------");
+            console.log(i.store_addr_x);
+            console.log(i.store_addr_y);
+        }));
+    }, [storeList]);      
 
     //render
     return (
@@ -64,9 +116,7 @@ export default function Search(){
                         )}
                     />
                 </StyledHeader>
-                <StyledBody>
-                    <MapView/>
-                </StyledBody>
+                {mapGear}
             </StyledConatainer>
         </StyledWindow>
     )

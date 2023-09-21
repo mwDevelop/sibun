@@ -1,23 +1,33 @@
 //------------------------------ MODULE --------------------------------
 import { useLayoutEffect, useState, useMemo, useRef } from 'react';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import DatePicker from 'react-native-date-picker';
-import { timeToText, errorAlert } from '@/lib';
-import { StopWatch } from '@/component';
-import { globalMsg } from '@/data/constants';
-import { apiCall, mobileMask, numberFilter, specialCharFilter } from '@/lib';
+import { StopWatch, ProfileImage, CheckBox } from '@/component';
+import { globalMsg, mailList } from '@/data/constants';
+import { apiCall, mobileMask, numberFilter, specialCharFilter, login, timeToText, errorAlert } from '@/lib';
 import uuid from 'react-native-uuid';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUserMutate } from '@/hooks';
+import Modal from 'react-native-modalbox'
 
 //---------------------------- COMPONENT -------------------------------
 export default function Join({route}){
     //init
     const navigation = useNavigation();
+    const userMutation = useUserMutate();
     const { page } = route.params;
-    const relayInfo = page ? route.params.relayInfo : { phoneData : '', nameData : '', genderData : 'm', birthData : '', finalDestination : 'Content'}; //default datas
+    const relayInfo = page ? route.params.relayInfo : { 
+        phoneData : '', 
+        nameData : '', 
+        genderData : 'm', 
+        birthData : '', 
+        mailFrontData : '', 
+        mailRearData : '', 
+        profileImgData: '',
+        finalDestination : route.params.finalDestination
+    }; //default datas
     const endPage = 2;
     const titleList = [
         "휴대폰번호를\n인증해 주세요",
@@ -31,42 +41,61 @@ export default function Join({route}){
     //state
     const [phone, setPhone] = useState(relayInfo.phoneData);
     const [realPhone, setRealPhone] = useState(relayInfo.phoneData);
-    const [pin, setPin] = useState('');
     const [name, setName] = useState(relayInfo.nameData);
-    const [dateModalOpen, setDateModalOpen] = useState(false);
     const [gender, setGender] = useState(relayInfo.genderData);
     const [birth, setBirth] = useState(relayInfo.birthData);
-    const [mailFront, setMailFront] = useState(relayInfo.mailFront);
-    const [mailRear, setMailRear] = useState(relayInfo.mailRear);
-    const [profileImage, setProfileImage] = useState(null);
-    const [marketing, setMarketing] = useState(null);
+    const [mailFront, setMailFront] = useState(relayInfo.mailFrontData);
+    const [mailRear, setMailRear] = useState(relayInfo.mailRearData);
+    const [profileImg, setProfileImg] = useState(relayInfo.profileImgData);
     const [finalDestination, setFinalDestination] = useState(relayInfo.finalDestination);
-
+    const [pin, setPin] = useState('');
+    const [dateModalOpen, setDateModalOpen] = useState(false);
+    const [termsModalOpen, setTermsModalOpen] = useState(false);
     /* status : ready -> refresh -> ing -> (certPass or certFail or certOver ) */
     const [phoneChk, setPhoneChk] = useState('ready'); 
     const [infoChk, setInfoChk] = useState(''); 
+    const [terms, setTerms] = useState([ //doesn't need to be registered to relayInfo cuz the state would change on the last page
+        {title: "선톡 이용약관", desc:"terms1", required:true, selected:false},
+        {title: "개인(신용)정보 이용", desc:"terms2", required:true, selected:false},
+        {title: "마케팅 수신동의 이용약관", desc:"terms3", required:false, selected:false},
+    ]);
 
     //function
+    const finalSave = async() => {
+        //terms check
+        let agreementChk = true;
+        terms.forEach((t) => {if(agreementChk && t.required && !t.selected) agreementChk = false}); //case required denied
+        if(!agreementChk) return console.log("denied!");
+
+        /* post data to server and make joininig target member ...... */
+        let params = { 
+            mb_id: uuid.v4().substring(0,18),
+            mb_passwd: uuid.v4().substring(0,18),
+            mb_cellphone: realPhone,
+            mb_name: name,
+            mb_gender: gender,
+            mb_birth: birth,
+            mb_profile_img: profileImg,
+            mb_email: mailFront+"@"+mailRear,
+            mb_marketing_yn: terms[2].selected ? "y" : "n"
+        };
+
+        userMutation.mutate({type:"add", params:params}, {onSuccess: async(res) => {
+            if(res.data.result == "000"){
+                const loginResult = await login(realPhone);
+                if(loginResult == "success") navigation.reset({routes: [{name: "JoinSuccess", params:{destination:finalDestination}}]});
+                else errorAlert('로그인 과정에서', () => navigation.reset({routes: [{name: "Login"}]}));
+            }else{
+                errorAlert("회원가입 과정에서", () => navigation.reset({routes: [{name: "Login"}]}));
+            }
+        }});
+        return;
+    }
+
     const moveNext = async() => {
         try{
             if(page == endPage){ //the last page
-                console.log({mail:mailFront+"@"+mailRear, ...relayInfo});
-                /* post data to server and make joininig target member ...... */
-                let params = { 
-                    mb_id: uuid.v4().substring(0,18),
-                    mb_passwd: uuid.v4().substring(0,18),
-                    mb_cellphone: realPhone,
-                    mb_name: name,
-                    mb_gender: gender,
-                    mb_email: mailFront+"@"+mailRear,
-                };
-                const joinResult = await apiCall.put('/user', {...params});
-
-                if(joinResult.data.result == "000"){
-                    navigation.replace("JoinSuccess");
-                }else{
-                    errorAlert("회원가입 과정에서", () => navigation.replace("Login"));
-                }
+                setTermsModalOpen(true);
                 return;
             }
     
@@ -78,17 +107,13 @@ export default function Join({route}){
                 const certResult = await checkCert(realPhone, pin);
                 if(!certResult) return;
 
-                /* checking the target is member.. */
-                let params = { mb_cellphone: realPhone };
-                const loginTryResult = await apiCall.post('/auth/loginv2', {...params});
-
-                if(loginTryResult.data.result == "000"){ //LOGIN
-                    AsyncStorage.setItem('access', loginTryResult.data.access_token);
-                    AsyncStorage.setItem('refresh', loginTryResult.data.refresh_token);
-                    navigation.replace(finalDestination);
-                    return;
-                }else if(loginTryResult.data.result == "001") console.log("join"); //JOIN
-                else return errorAlert('', () => navigation.replace("Login"));
+                /* try login */
+                const loginResult = await login(realPhone);
+                if(loginResult == "success") {
+                    return navigation.reset({routes: [{name: finalDestination}]});
+                }
+                if(loginResult == "error") return errorAlert('', () => navigation.reset({routes: [{name: "Login"}]}));
+                if(loginResult == "join") console.log("join"); //continue to next block
             }
 
             if(page == 1){ //name, birth, gender chk
@@ -101,12 +126,15 @@ export default function Join({route}){
                 nameData : name,
                 genderData : gender,
                 birthData : birth,
+                mailFrontData : mailFront,
+                mailRearData : mailRear,
+                profileImgData: profileImg,
                 finalDestination : finalDestination,
             }
             navigation.replace("로그인 / 회원가입", {page:page+1, relayInfo : relayObj});
         }catch(e){
             console.log(e);
-            errorAlert('', () => navigation.replace("Login"));
+            errorAlert('', () => navigation.reset({routes: [{name: "Login"}]}));
         }
     }
 
@@ -183,7 +211,8 @@ export default function Join({route}){
         const targetDate = birth || null;
         return (
             <>
-                <StyledInput ref={nameInput} value={name} onChangeText={(text) => setName(text)} placeholder="이름"/>
+                <ProfileImage src={profileImg} changeHandler={setProfileImg}/>
+                <StyledInput ref={nameInput} value={name} onChangeText={(text) => setName(text)} placeholder="이름" style={{marginTop:25}}/>
                 <StyledInput onPressIn={() => setDateModalOpen(true)} value ={timeToText(targetDate, 'y  /  mm  /  dd')} placeholder="생년월일"/>
                 <StyledButtonArea>
                     <StyledButtonText selected={gender == "m"} onPress={() => setGender('m')} suppressHighlighting={true}>남자</StyledButtonText>
@@ -192,7 +221,7 @@ export default function Join({route}){
                 <StyledInputMessage passed={false}>{infoChk in globalMsg ? '* '+globalMsg[infoChk] : ' '}</StyledInputMessage>
             </>
         )
-    }, [birth, name, gender, infoChk]);
+    }, [profileImg, birth, name, gender, infoChk]);
     
     const emailGear = useMemo(() => {
         return (
@@ -209,13 +238,7 @@ export default function Join({route}){
                         //initialValue={{ id: '1' }}
                         onSelectItem={(v) => setMailRear(v && v.title)}
                         onChangeText={(v) => setMailRear(v)}
-                        dataSet={[
-                            { id: '1', title: 'gmail.com' },
-                            { id: '2', title: 'naver.com' },
-                            { id: '3', title: 'daum.net' },
-                            { id: '4', title: 'hanmail.net' },
-                            { id: '5', title: 'yahoo.co.kr' },
-                        ]}
+                        dataSet={mailList}
                         textInputProps={{
                             placeholder: 'example.com',
                         }}                        
@@ -252,6 +275,20 @@ export default function Join({route}){
             />
         )
     }, [dateModalOpen]);
+
+    const termsModalGear = useMemo(() => (
+        <StyledTermsModal
+            isOpen={termsModalOpen}
+            onClosed={() => {setTermsModalOpen(false)}}
+            backdropOpacity={0.4}
+            position="bottom"
+        >
+            <StyledTermsView>
+                <CheckBox list={terms} termsHandler={setTerms}/>
+                <StyledSubmit suppressHighlighting={true} onPress={finalSave}>확인</StyledSubmit>
+            </StyledTermsView>
+        </StyledTermsModal>
+    ), [termsModalOpen, terms]);
 
     const memoGroup = [phoneGear, infoGear, emailGear];
 
@@ -291,6 +328,7 @@ export default function Join({route}){
                 </StyledFooterNext>
             </StyledFooter>
             {dateModalGear}
+            {termsModalGear}
         </StyledConatainer>
     )
 }
@@ -403,4 +441,23 @@ const StyledButtonText = styled.Text`
     font-size:14px;
     font-weight:400;
     text-align:center;
+`;
+const StyledTermsModal = styled(Modal)`
+    height:300px;
+    border-top-right-radius:25px;
+    border-top-left-radius:25px;
+`;
+const StyledTermsView = styled.View`
+    padding:20px;
+`;
+const StyledSubmit = styled.Text`
+    border-radius:5px;
+    line-height:48px
+    background:#F33562;
+    overflow:hidden;
+    text-align:center;
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    margin-top:20px;
 `;

@@ -85,9 +85,7 @@ export default function Slider({
                                     <StyledSliderSub>{item.sub}</StyledSliderSub>
                                 ) : null}
                                 {'custom' in item ? (
-                                    <StyledSliderCustom>
-                                    {item.custom}
-                                    </StyledSliderCustom>
+                                    <StyledSliderCustom>{item.custom}</StyledSliderCustom>
                                 ) : null}                                
                             </StyledSliderBox>
                         </StyledSliderUnit>

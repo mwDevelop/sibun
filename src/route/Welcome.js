@@ -4,8 +4,9 @@ import styled from 'styled-components/native';
 import FastImage from 'react-native-fast-image';
 
 //---------------------------- COMPONENT -------------------------------
-export default function Welcome(){
+export default function Welcome({route}){
     //init
+    const { destination } = route.params;
     const navigation = useNavigation();
 
     //render
@@ -19,12 +20,12 @@ export default function Welcome(){
                 <StyledImage source={{uri:"https://media.tenor.com/gbdwfQLxMXQAAAAC/good-taste-nice.gif", priority: FastImage.priority.normal}}/>
             </StyledBody>
             <StyledFooter>
-                <StyledConfirm onPress={() => navigation.replace("Content")}>
+                <StyledConfirm onPress={() => navigation.replace(destination)}>
                     <StyledConfirmText>
                         보러가기
                     </StyledConfirmText>
                 </StyledConfirm>
-                <StyledConfirmSubText onPress={() => navigation.replace("Content")}>
+                <StyledConfirmSubText onPress={() => navigation.replace(destination)}>
                     다음에 볼게요
                 </StyledConfirmSubText>
             </StyledFooter>

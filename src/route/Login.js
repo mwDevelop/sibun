@@ -1,33 +1,73 @@
 //------------------------------ MODULE --------------------------------
 import { Platform } from  'react-native';
-import { useMemo } from  'react';
+import { useMemo, useLayoutEffect } from  'react';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styled from 'styled-components/native';
 import MaIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Toast from 'react-native-toast-message';
+import {login_kakao, login_apple, login_mobile} from '@/assets/img';
+import FastImage from 'react-native-fast-image';
 
 //---------------------------- COMPONENT -------------------------------
-export default function Login(){
+export default function Login({route}){
     //init
+    const tabFlag = route.params && "icon" in route.params ? true : false;
+    const expiredFlag = route.params && "expired" in route.params ? true : false;
+    const afterLoginPage = null;
     const navigation = useNavigation();
 
+    //state
+
     //memo
+    const headerGear = useMemo(() => (
+        <>
+        {
+        tabFlag ? null : (
+            <StyledFreePass suppressHighlighting={true} onPress={() => navigation.replace('Content')}>
+                둘러보기
+            </StyledFreePass>                
+        )
+        }
+        <StyledTitleTextArea>
+            <StyledTitleMain>SUN</StyledTitleMain>
+            <StyledTitleMain>TALK</StyledTitleMain>
+        </StyledTitleTextArea>
+        </>
+    ), []);
+
+    const contentTitleGear = useMemo(() => (
+        <StyledContentTitle>
+            <StyledContentTitleLine />
+            <StyledContentTitleText>회원가입/로그인 3초만에 하기</StyledContentTitleText>
+        </StyledContentTitle>
+    ), []);
+
+    const extraGear = useMemo(() => (
+        <StyledFindAccountText suppressHighlighting={true} onPress={() => navigation.push('계정찾기')}>
+            이메일로 계정찾기
+        </StyledFindAccountText>
+    ), []);
+
     const buttonGear  = useMemo(() => {
         const buttonList = [
             {
                 icon : <MaIcon name='chat' color="#351209" size={33}/>,
                 background: '#FFEF61',
+                img: login_kakao,
                 event: () => AsyncStorage.clear()
             },
             {
                 icon : <MaIcon name='cellphone' size={40}/>,
                 background: 'white',
-                event: () => navigation.navigate("로그인 / 회원가입", {page: 0})
+                img: login_mobile,
+                event: () => navigation.navigate("로그인 / 회원가입", {page: 0, finalDestination: afterLoginPage || 'Content'})
             },
             Platform.OS === "ios" ? {
                 icon : <MaIcon name='apple' color="white" size={33}/>,
                 background: '#333',
-                event: () => navigation.replace("Content")
+                img: login_apple,
+                event: () => AsyncStorage.clear()
             } : null,              
         ]
 
@@ -35,8 +75,8 @@ export default function Login(){
             <>
             {
                 buttonList.map((item, index) => item ? (
-                    <StyledContentButtonItem key={index} background={item.background} border={item.border} onPress={item.event}>
-                        {item.icon}
+                    <StyledContentButtonItem key={index} onPress={item.event}>
+                        <StyledContentButtonImage source={item.img}/>
                     </StyledContentButtonItem>
                 ) : null)
             }
@@ -44,30 +84,30 @@ export default function Login(){
         )
     }, [])
 
+    //effect
+    useLayoutEffect(() => {
+        if(expiredFlag){
+            Toast.show({
+                type: 'bad',
+                text1: route.params.expired,
+                topOffset: 120,
+                visibilityTime: 1000
+            })
+        }
+    }, []);
+
     //render
     return(
         <StyledConatainer>
             <StyledTitleSection>
-                <StyledFreePass suppressHighlighting={true} onPress={() => navigation.replace('Content')}>
-                    둘러보기
-                </StyledFreePass>                
-                <StyledTitleTextArea>
-                    <StyledTitleMain>SUN</StyledTitleMain>
-                    <StyledTitleMain>TALK</StyledTitleMain>
-                    {/*<StyledTitleSub>선톡에 오신 것을 환영합니다.</StyledTitleSub>*/}
-                </StyledTitleTextArea>
+                {headerGear}
             </StyledTitleSection>
             <StyledContentSection>
-                <StyledContentTitle>
-                    <StyledContentTitleLine />
-                    <StyledContentTitleText>회원가입/로그인 3초만에 하기</StyledContentTitleText>
-                </StyledContentTitle>
+                {contentTitleGear}
                 <StyledContentButton>
                     {buttonGear}
                 </StyledContentButton>
-                <StyledFindAccountText suppressHighlighting={true} onPress={() => navigation.navigate('계정찾기')}>
-                    이메일로 계정찾기
-                </StyledFindAccountText>
+                {extraGear}
             </StyledContentSection>
         </StyledConatainer>
     )
@@ -92,11 +132,6 @@ const StyledTitleMain = styled.Text`
     font-size:45px;
     font-weight:800;  
     color:#F33562;
-`;
-const StyledTitleSub = styled.Text`
-    flex:1;
-    color:#7A7A7A;
-    font-weight:400;  
 `;
 const StyledContentSection = styled.View`
     flex:1;
@@ -128,15 +163,10 @@ const StyledContentButton = styled.View`
     align-self:center;  
 `;
 const StyledContentButtonItem = styled.TouchableOpacity`
-    background:${(props) => props.background || '#eee'};
-    margin:6px 0;
-    width:65px;
-    height:65px;
-    border-radius:32.5px;
-    shadow-color: black; shadow-offset: 5px; shadow-opacity: 0.2; shadow-radius:8px;
-    elevation:2;
-    justify-content:center;
-    align-items:center;
+`;
+const StyledContentButtonImage = styled(FastImage)`
+    width:80px;
+    height:80px;
 `;
 const StyledFindAccountText = styled.Text`
     text-align:center;
@@ -146,7 +176,7 @@ const StyledFindAccountText = styled.Text`
 `;
 const StyledFreePass = styled.Text`
     position:absolute;
-    top:8%;
+    top:5%;
     right:8%;
     font-size:14px;
     color:#ccc;

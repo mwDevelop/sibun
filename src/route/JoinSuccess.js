@@ -4,8 +4,9 @@ import styled from 'styled-components/native';
 import FastImage from 'react-native-fast-image';
 
 //---------------------------- COMPONENT -------------------------------
-export default function JoinSuccess(){
+export default function JoinSuccess({route}){
     //init
+    const { destination } = route.params;
     const navigation = useNavigation();
 
     //render
@@ -18,7 +19,7 @@ export default function JoinSuccess(){
                 <StyledImage source={{uri:"https://media.tenor.com/gbdwfQLxMXQAAAAC/good-taste-nice.gif", priority: FastImage.priority.normal}}/>
             </StyledBody>
             <StyledFooter>
-                <StyledConfirm onPress={() => navigation.replace("Welcome")}>
+                <StyledConfirm onPress={() => navigation.replace("Welcome", {destination:destination})}>
                     <StyledConfirmText>
                         확인
                     </StyledConfirmText>
