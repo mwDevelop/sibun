@@ -2,27 +2,27 @@
 import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import FastImage from 'react-native-fast-image';
+import { welcome } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
 export default function JoinSuccess({route}){
     //init
-    const { destination } = route.params;
+    const { name, destination } = route.params;
     const navigation = useNavigation();
 
     //render
     return (
         <StyledConatainer>
-            <StyledHeader>
-                <StyledHeaderText>회원가입이 완료됐어요 !</StyledHeaderText>
-            </StyledHeader>
             <StyledBody>
-                <StyledImage source={{uri:"https://media.tenor.com/gbdwfQLxMXQAAAAC/good-taste-nice.gif", priority: FastImage.priority.normal}}/>
+                <StyledImageBox>
+                    <StyledImage source={welcome} resizeMode="contain"/>
+                    <StyledSmallText>가입 완료!</StyledSmallText>
+                </StyledImageBox>
+                <StyledLargeText>{name}님, 환영합니다</StyledLargeText>
             </StyledBody>
             <StyledFooter>
-                <StyledConfirm onPress={() => navigation.replace("Welcome", {destination:destination})}>
-                    <StyledConfirmText>
-                        확인
-                    </StyledConfirmText>
+                <StyledConfirm onPress={() => navigation.replace(destination)} suppressHighlighting={true}>
+                    확인
                 </StyledConfirm>
             </StyledFooter>
         </StyledConatainer>
@@ -34,40 +34,44 @@ const StyledConatainer = styled.View`
     flex:1;
     background:white;
 `;
-const StyledHeader = styled.View`
-    flex:1;
-    align-items:center;
+const StyledBody = styled.View`
     justify-content:flex-end;
+    align-items:center;
+    flex:1.2;
 `;
-const StyledHeaderText = styled.Text`
+const StyledImageBox = styled.View`
+    align-items:center;
+`;
+const StyledImage = styled(FastImage)`
+    width:100px;
+    height:100px;
+    left:15px;
+    margin-bottom:5px;
+`;
+const StyledSmallText = styled.Text`
+    font-size:16px;
+    font-weight:500;
+    color:rgba(243, 53, 98, 0.98);
+    margin:10px 0;
+`;
+const StyledLargeText = styled.Text`
     font-size:20px;
     font-weight:600;
     color:#222;
 `;
-const StyledBody = styled.View`
-    flex:2;
-    justify-content:center;
-    align-items:center;
-`;
-const StyledImage = styled(FastImage)`
-    width:300px;
-    height:300px;
-`;
 const StyledFooter = styled.View`
+    padding:20px;
+    justify-content:flex-end;
     flex:1;
-    justify-content:center;
-    align-items:center;
 `;
-const StyledConfirm = styled.TouchableOpacity`    
-    border-color:#DDD;
-    border-width:1px;
-    width:90%;
-    height:50px;
-    border-radius:50px;
-    align-items:center;
-    justify-content:center;
-`;
-const StyledConfirmText = styled.Text`    
+const StyledConfirm = styled.Text`    
+    border-radius:5px;
+    line-height:48px
+    background:#F33562;
+    overflow:hidden;
+    text-align:center;
+    color:#fff;
     font-size:16px;
-    font-weight:500;
+    font-weight:600;
+    margin-bottom:50px;
 `;

@@ -383,7 +383,7 @@ const StyledHashTagBox = styled.View`
     border-width:1px;
     border-color:#222;
     border-radius:50px;
-    padding:5px 8px;  
+    padding:5px 8px 4px 8px;  
     margin-top: 10px;
     margin-right: 10px;
 `;

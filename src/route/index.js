@@ -5,7 +5,6 @@ export { default as Login} from "./Login";
 export { default as Join} from "./Join";
 export { default as FindAccount} from "./FindAccount";
 export { default as JoinSuccess} from "./JoinSuccess";
-export { default as Welcome} from "./Welcome";
 /*-----------------------------------------------------------*/
 export { default as Home } from "./Home";
 export { default as Desc } from "./Desc";
@@ -15,7 +14,11 @@ export { default as Mypage } from "./Mypage";
 export { default as Setting } from "./Setting";
 export { default as ProfileEdit } from "./ProfileEdit";
 export { default as Leave } from "./Leave";
-export { default as ReservationList } from "./ReservationList";
+export { default as ReservationReady } from "./ReservationReady";
+export { default as ReservationDone } from "./ReservationDone";
+export { default as ReviewAddible } from "./ReviewAddible";
+export { default as ReviewMyList } from "./ReviewMyList";
+export { default as ReviewAdd } from "./ReviewAdd";
 /*-----------------------------------------------------------*/
 export { default as Search} from "./Search";
 export { default as Reservation } from "./Reservation";

@@ -4,8 +4,10 @@ export default function timeToText(date=new Date(), format='y년 m월 d일 h시 
         if(!date) return null;
         let target = format;
     
-        if(target.includes('y')) target = target.replace('y',date.getFullYear());
-    
+        const y = date.getFullYear();
+        if(target.includes('yy')) target = target.replace('yy',y.toString().substr(2,2));
+        if(target.includes('y')) target = target.replace('y',y);
+
         const matchObj = {
             m : date.getMonth()+1,
             d : date.getDate(),

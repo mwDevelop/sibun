@@ -29,3 +29,6 @@ export { default as login_mobile } from "./login_mobile.png";
 export { default as map_target } from "./map_target.png";
 export { default as map_list } from "./map_list.png";
 export { default as marker_wish } from "./marker_wish.png";
+
+export { default as welcome } from "./welcome.png";
+

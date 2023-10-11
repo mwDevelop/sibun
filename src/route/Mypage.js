@@ -30,7 +30,7 @@ export default function Mypage(){
                 icon: chat_balloon,
                 iconSize:[28,23],
                 text: "내후기",
-                link: "예약내역"
+                link: "리뷰관리"
             },
             {
                 icon: document_open,

@@ -13,3 +13,5 @@ export { default as login } from "./login";
 export { default as logout } from "./logout";
 export { default as cloneObject } from "./cloneObject";
 export { default as textCut } from "./textCut";
+export { default as getDistance } from "./getDistance";
+export { default as uniquePush } from "./uniquePush";

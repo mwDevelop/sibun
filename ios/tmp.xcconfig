@@ -3,5 +3,5 @@ APP_ID=kr.majorworld.suntalk.develop
 BUILD_VERSION=1
 APP_VERSION=1.0.0
 APP_NAME=SUNTALK - DEV
-APP_API_URL=http:/$()/suntalk.mirae.site/api
+APP_API_URL=http:/$()/sibun.co.kr/api
 APP_API_SECRET=mjsuntalk

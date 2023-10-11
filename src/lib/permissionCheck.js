@@ -18,7 +18,7 @@ import { Alert, Linking } from 'react-native';
         => DENIED일 경우 계속해서 request 요청 but blocked return 될 경우는 SETTING으로 리다이렉트
 */
 
-export default async function permissionCheck(device, type){
+export default async function permissionCheck(device, type, onlyChk = false){
     try{
         const options = {
             'ios' : {
@@ -69,7 +69,7 @@ export default async function permissionCheck(device, type){
                     case RESULTS.DENIED:
                         console.log('The permission has not been requested / is denied but requestable');
                         request(options[device][type]).then((res) => {
-                            if(device == 'android' && res == 'blocked') settingAlert();
+                            if(device == 'android' && res == 'blocked' && !onlyChk) settingAlert();
                             resolve('denied');
                         }).catch((error) => console.log(error));
                         break;

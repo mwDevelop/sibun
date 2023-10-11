@@ -10,7 +10,7 @@ import { globalMsg, mailList } from '@/data/constants';
 import { apiCall, mobileMask, numberFilter, specialCharFilter, login, timeToText, errorAlert } from '@/lib';
 import uuid from 'react-native-uuid';
 import { useUserMutate } from '@/hooks';
-import Modal from 'react-native-modalbox'
+import Modal from 'react-native-modalbox';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Join({route}){
@@ -83,7 +83,7 @@ export default function Join({route}){
         userMutation.mutate({type:"add", params:params}, {onSuccess: async(res) => {
             if(res.data.result == "000"){
                 const loginResult = await login(realPhone);
-                if(loginResult == "success") navigation.reset({routes: [{name: "JoinSuccess", params:{destination:finalDestination}}]});
+                if(loginResult == "success") navigation.reset({routes: [{name: "JoinSuccess", params:{name:name, destination:finalDestination}}]});
                 else errorAlert('로그인 과정에서', () => navigation.reset({routes: [{name: "Login"}]}));
             }else{
                 errorAlert("회원가입 과정에서", () => navigation.reset({routes: [{name: "Login"}]}));

@@ -1,15 +1,16 @@
 //------------------------------ MODULE --------------------------------
-import { useLayoutEffect, useState, useMemo } from 'react';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { ReviewEdit } from '@/component';
 
 //---------------------------- COMPONENT -------------------------------
-export default function ReservationList(){
+export default function ReviewAdd({route}){
+    //init
+    const { reservationData } = route.params;
+
     //render
     return (
         <StyledConatainer>
-            
+            <ReviewEdit reservationData={reservationData}/>
         </StyledConatainer>
     )
 }

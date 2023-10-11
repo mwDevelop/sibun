@@ -9,8 +9,8 @@ export default function useReservation(id = null, params = null){
     const defaultKey = `reservation`;
     let queryKey = [defaultKey];
     if(id){
-        queryKey.push('id'); //key for each store
-        queryKey.push(id); //key for each store
+        queryKey.push('id'); 
+        queryKey.push(id); 
         params = null;
     }else if(params){
         queryKey.push('params');

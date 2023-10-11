@@ -14,7 +14,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { star_filled, marker_wish } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
-export default function MapView({markerData = [], onCenterChange = () => {}}){
+export default function MapView({markerData = [], onCenterChange = () => {}, listOpen = () => {}}){
     //init
     const mapRef = useRef();
 
@@ -50,7 +50,13 @@ export default function MapView({markerData = [], onCenterChange = () => {}}){
     }     
 
     //memo
-    const mapGear = useMemo(() => (
+    const mapGear = useMemo(() => {
+        /*
+        markerData.forEach((d) => {
+            console.log(d.name);  
+        });
+        */
+        return (
         <>
             <NaverMapView 
                 ref = {mapRef}
@@ -62,10 +68,9 @@ export default function MapView({markerData = [], onCenterChange = () => {}}){
                 maxZoomLevel={16}
                 //nightMode={true}
                 onTouch={e => setShop(null)}
-                //onMapClick={e => console.warn('onMapClick', JSON.stringify(e))
+                onMapClick={e => setShop(null)}
             >   
             {
-                
                 markerData.map((item, index) => (
                     <Marker 
                         key={index}
@@ -104,12 +109,13 @@ export default function MapView({markerData = [], onCenterChange = () => {}}){
                 <StyledButton onPress={selfTarget}>
                     <StyledTargetImage source={map_target}/>
                 </StyledButton>
-                <StyledButton>
+                <StyledButton onPress={() => listOpen(true)}>
                     <StyledListImage source={map_list}/>
                 </StyledButton>
             </StyledCustomArea>
         </> 
-    ), [markerData]);
+        )
+    }, [markerData]);
 
     const shopGear = useMemo(() => {
         return !shop ? null : (
@@ -133,7 +139,13 @@ export default function MapView({markerData = [], onCenterChange = () => {}}){
                         {shop.addr}
                     </StyledShopAddr>
                 </StyledShopBody>
-
+                <StyledShopFooter>
+                    {
+                        shop.tag.map((t, i) => (t && i < 4) ? ( 
+                            <StyledShopTag key={i} highligth={t=="할인중" || t=="즉시가능"}>{t}</StyledShopTag>
+                        ) : (i == 4 ? <StyledPlusTagText key={i}>+{shop.tag.length-4}</StyledPlusTagText> : null))
+                    }
+                </StyledShopFooter>
             </StyledShopBox>
         )
     }, [shop])
@@ -143,12 +155,16 @@ export default function MapView({markerData = [], onCenterChange = () => {}}){
         selfTarget();
     }, []);
 
+    useLayoutEffect(() => {
+        setShop(null);
+    }, [markerData]);
+
     //render
     return (
         <>
-        <CustomInnerLoading lottie={map_loading} delay={3000}/>   
-        {mapGear}
-        {shopGear}
+            <CustomInnerLoading lottie={map_loading} delay={3000}/>   
+            {mapGear}
+            {shopGear}
         </>
     )
 }
@@ -171,37 +187,43 @@ const StyledListImage = styled(FastImage)`
 `;
 const StyledShopBox = styled(Animated.View)`
     width:85%;
-    
     position:absolute;
     background:#fff;
     align-self:center;
-    border-radius:10px;
+    border-radius:5px;
     bottom:15%;
-    shadow-color: black; 
-    shadow-offset: 5px; 
-    shadow-opacity: 0.3; 
+    shadow-color:black; 
+    shadow-offset:5px; 
+    shadow-opacity:0.3; 
     shadow-radius:8px;
     elevation:1;
+    padding:15px 25px;
 `;
 const StyledShopHeader = styled.View`
     flex-direction:row;
-    padding:20px;
 `;
 const StyledShopImageArea = styled.View`
     flex:1;
+    shadow-color: black; 
+    shadow-offset: 3px; 
+    shadow-opacity: 0.4; 
+    shadow-radius:5px;
+    elevation:1;
 `;
 const StyledShopImage = styled(FastImage)`
     width:120px;
     height:120px;
     background:black;
     position:absolute;
-    bottom:-20px;
+    bottom:10px;
+    left:-8px;
     border-radius:5px;
-
 `;
 const StyledShopReviewArea = styled.View`
     flex:1;
     flex-direction:row;
+    padding-top:15px;
+    padding-bottom:25px;
 `;
 const StyledStarImage = styled(FastImage)`
     height:25px;
@@ -218,7 +240,7 @@ const StyledReviewHighLight = styled.Text`
     font-weight:700;
 `;
 const StyledShopBody = styled.View`
-    padding:10px 25px;
+    
 `;
 const StyledShopTitle = styled.Text`
     color:#222;
@@ -230,4 +252,23 @@ const StyledShopAddr = styled.Text`
     color:#7D7D7D;
     font-weight:400;
     padding-bottom:5px;
+`;
+const StyledShopFooter = styled.View`
+    flex-direction:row;
+`;
+const StyledShopTag = styled.Text`
+    font-size:12px;
+    font-weight:500;
+    border-radius:5px;
+    background:${(props) => props.highligth ? '#FFA0B1': '#E9E9E9'};
+    color:${(props) => props.highligth ? '#fff': '#444'};
+    padding:3px 5px;
+    margin-right:5px;
+    overflow:hidden;
+`;
+const StyledPlusTagText = styled.Text`
+    font-size:12px;
+    font-weight:700;
+    color:#444;
+    padding:2px 0;
 `;

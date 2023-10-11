@@ -20,7 +20,7 @@ export default function Schedule(){
     const scrollViewRef = useRef(null);
 
     //data
-    const [reservation, reservationUpdate] = useReservation(null, {'type':'reservation_date'});
+    const [reservation, reservationUpdate] = useReservation(null, {'type':'reservation_date', 'col':'reservation_date,reservation_time'});
 
     //state
     const [chkDate, setChkDate] = useState(null); 

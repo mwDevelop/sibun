@@ -4,6 +4,7 @@ import { Text, View, Image, SafeAreaView } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { 
@@ -11,7 +12,6 @@ import {
     Login,
     Join,
     JoinSuccess,
-    Welcome,
     FindAccount, 
     Home, 
     Mypage, 
@@ -25,7 +25,11 @@ import {
     Reservation, 
     Schedule, 
     ReservationDesc,
-    ReservationList,
+    ReservationReady,
+    ReservationDone,
+    ReviewAddible,
+    ReviewMyList,
+    ReviewAdd,
     ModalGroup,
     NetworkError 
 } from '@/route';
@@ -42,6 +46,7 @@ import NetInfo from "@react-native-community/netinfo";
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
 //---------------------------- COMPONENT --------------------------------
 /* -------------------- ETC ---------------------- */
@@ -64,7 +69,7 @@ const ProfileEditSaveButton = () => {
     )
 };
 
-/* ------------------- TABS ---------------------- */
+/* ------------------- BOTTOM TAB ---------------------- */
 const ContentTab = () => {
     //state
     const access = useStorage('access');
@@ -90,6 +95,56 @@ const ContentTab = () => {
         </Tab.Navigator>
     )
 };
+
+/* ------------------- TOP TAB ---------------------- */
+const ReservationTab = () => {
+    return (
+        <TopTab.Navigator
+            initialRouteName='예약중'
+            style={{
+                backgroundColor:'#fff',
+            }}
+            screenOptions={{   
+                tabBarStyle:{paddingTop:15},
+                tabBarItemStyle: { width: 100 },
+                tabBarPressColor: 'transparent',
+                tabBarActiveTintColor: '#222',
+                tabBarInactiveTintColor: '#7D7D7D',
+                tabBarLabelStyle: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                },    
+                tabBarIndicatorStyle: { backgroundColor: '#222' },                  
+            }}>
+            <TopTab.Screen name="예약중" component={ReservationReady} />
+            <TopTab.Screen name="이용완료" component={ReservationDone} />
+        </TopTab.Navigator>        
+    )
+}
+
+const ReviewTab = () => {
+    return (
+        <TopTab.Navigator
+            initialRouteName='리뷰 작성'
+            style={{
+                backgroundColor:'#fff',
+            }}
+            screenOptions={{   
+                tabBarStyle:{paddingTop:15, marginRight:20, marginLeft:20},
+                tabBarPressColor: 'transparent',
+                tabBarActiveTintColor: '#222',
+                tabBarInactiveTintColor: '#7D7D7D',
+                tabBarLabelStyle: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                },    
+                tabBarIndicatorStyle: { backgroundColor: '#222' },
+            }}>
+            <TopTab.Screen name="리뷰 작성" component={ReviewAddible} />
+            <TopTab.Screen name="나의 리뷰" component={ReviewMyList} />
+        </TopTab.Navigator>        
+    )
+}
 
 /* ---------------- ROOT STACK -------------------- */
 const RootStack = () => {
@@ -141,7 +196,6 @@ const RootStack = () => {
                 },
                 headerBackTitleVisible: false,
                 headerBackImage: backButton,
-                
             })}        
         >
             {/********************* INTRO & PERMISSION **********************/}                
@@ -151,7 +205,6 @@ const RootStack = () => {
             <Stack.Screen name="Login" component={Login}/>
             <Stack.Screen name="로그인 / 회원가입" component={Join} options={{headerShown:true}}/>
             <Stack.Screen name="JoinSuccess" component={JoinSuccess}/>
-            <Stack.Screen name="Welcome" component={Welcome}/>
             <Stack.Screen name="계정찾기" component={FindAccount} options={{headerShown:true}}/>
             {/**************************** TABS ******************************/}
             <Stack.Screen name="Content" component={ContentTab}/>
@@ -166,7 +219,9 @@ const RootStack = () => {
             <Stack.Screen name="Setting" component={Setting}/>
             <Stack.Screen name="프로필 수정" component={ProfileEdit} options={{headerShown:true, headerRight:() => (<ProfileEditSaveButton/>)}}/>
             <Stack.Screen name="회원탈퇴" component={Leave} options={{headerShown:true}}/>
-            <Stack.Screen name="예약내역" component={ReservationList} options={{headerShown:true}}/>
+            <Stack.Screen name="예약내역" component={ReservationTab} options={{headerShown:true,headerShadowVisible: false}}/>
+            <Stack.Screen name="리뷰관리" component={ReviewTab} options={{headerShown:true,headerShadowVisible: false}}/>
+            <Stack.Screen name="리뷰작성" component={ReviewAdd} options={{headerShown:true}}/>
             {/**************************** MODAL *****************************/}
             <Stack.Screen
                 name="ModalGroup"

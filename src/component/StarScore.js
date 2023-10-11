@@ -6,7 +6,7 @@ import { star_filled, star_half, star_empty } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
 //render
-export default React.memo(({score=0, size=14, showText=false}) => {
+export default React.memo(({score=0, size=14, showText=false, scoreCatch=() => {}, starGap='1.5%'}) => {
     //function
     const starTemplate = () => {
         const starList = [];
@@ -16,7 +16,11 @@ export default React.memo(({score=0, size=14, showText=false}) => {
             if(chk >= 1) icon = star_filled;
             else if(chk > 0) icon = star_half;
             else icon = star_empty;
-            starList.push(<StyledStarUnit key={i} source={icon} size={size} endChk={i==4}/>);
+            starList.push(
+                <StyledStarUnitCover key={i} onPress={() => scoreCatch(i+1)} >
+                    <StyledStarUnit source={icon} size={size} endChk={i==4} starGap={starGap}/>
+                </StyledStarUnitCover>
+            );
         }        
         return starList;
     }
@@ -43,10 +47,12 @@ const StyledStarRow = styled.View`
     flex-direction:row;
     justify-content:space-between;
 `;
+const StyledStarUnitCover = styled.TouchableOpacity`
+`;
 const StyledStarUnit = styled(FastImage)`
     width:${(props) => props.size}px;
     height:${(props) => props.size}px;
-    margin-right:${(props) => props.endChk ? '0' : '1.5'}%;
+    margin-right:${(props) => props.endChk ? '0' : props.starGap};
 `;
 const StyledScoreText = styled.Text`
     color:#F33562;
