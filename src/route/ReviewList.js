@@ -1,11 +1,10 @@
 //------------------------------ MODULE --------------------------------
 import { useMemo, useState } from 'react';
 import styled from 'styled-components/native';
-import { useReview, useStore } from '@/hooks';
+import { useStoreReview, useStore } from '@/hooks';
 import { StarScore, ReviewListView, CustomSelect } from '@/component';
 import { reviewScoreOption } from '@/data/constants';
 import { cloneObject } from '@/lib';
-import { defaultImage } from '@/data/constants';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ReviewList({route}){
@@ -13,7 +12,7 @@ export default function ReviewList({route}){
     const { storeIdx } = route.params;
 
     //data
-    const [review] = useReview(storeIdx);
+    const [review] = useStoreReview(storeIdx);
     const [store] = useStore(storeIdx);
 
     //state
@@ -55,13 +54,6 @@ export default function ReviewList({route}){
     const reviewChartGear = useMemo(() => {
         if(!review || !review.length) return null; //optional
 
-        /* TEST SAMPLE IMAGE */
-        //review[0].review_img1 = "https://picsum.photos/200/300";
-        //review[3].review_img1 = "https://picsum.photos/200/300";
-        //review[3].review_img2 = "https://picsum.photos/200/300";
-        //review[3].review_img3 = "https://picsum.photos/200/300";
-        
-
         const menu = cloneObject(reviewScoreOption); //deep copy
         let isImgList = []; //extra count for isPhoto state
         review.forEach((data) => { //couting reviews for each score key
@@ -81,13 +73,14 @@ export default function ReviewList({route}){
                     Object.entries(menu) //into array
                     .sort((a, b) => Number(b[0]) - Number(a[0])) //reverse order
                     .map(([key, val]) => {
+                        const percentage = val.cnt/review.length*100;
                         return (
                             <StyledScoreChartRow key={key}>
                                 <StyledScoreChartTitle>
                                     {val.title} ({key}점)
                                 </StyledScoreChartTitle>
                                 <StyledScoreChartBar>
-                                    <StyledScoreChartBarPercent ratio={ val.cnt/review.length*100 }/>
+                                    <StyledScoreChartBarPercent ratio={ percentage ? val.cnt/review.length*100 : 0 }/>
                                 </StyledScoreChartBar>
                                 <StyledScoreChartNumber>
                                     {val.cnt ? (val.cnt/review.length*100).toFixed(0) : 0} %
@@ -101,14 +94,7 @@ export default function ReviewList({route}){
     }, [review]);
 
     const reviewListGear = useMemo(() => {
-        if(!review) return null; //optional
-
-        /* TEST SAMPLE IMAGE */
-        //review[0].review_img1 = "https://picsum.photos/200/300";
-        //review[3].review_img1 = "https://picsum.photos/200/300";
-        //review[3].review_img2 = "https://picsum.photos/200/300";
-        //review[3].review_img3 = "https://picsum.photos/200/300";
-        
+        if(!review) return <StyledEmptyText>등록된 리뷰 건이 없습니다.</StyledEmptyText>; //optional
 
         let targetdata = !isPhoto ? review : photoReview; //photo filter
         
@@ -231,4 +217,10 @@ const StyleReviewListTopFence = styled.Text`
 const StyledReviewListTopPhoto = styled.Text`
     color:#444;
     font-weight:${(props) => props.highlight ? "700" : "400"};
+`;
+const StyledEmptyText = styled.Text`
+    align-self:center;
+    top:50px;
+    color:#555;
+    font-weight:500;
 `;

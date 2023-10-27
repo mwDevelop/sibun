@@ -11,6 +11,7 @@ import { koreanDay, reservationStatus } from '@/data/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { alertDefaultSetting } from '@/data/constants';
 import Toast from 'react-native-toast-message';
+import QRCode from 'react-native-qrcode-svg';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ReservationDesc({route}){
@@ -24,7 +25,7 @@ export default function ReservationDesc({route}){
     const [user] = useUser();
 
     //state
-    const [cancelAlert, setCancelAlert] = useState('');
+    const [confirm, setConfirm] = useState(false);
 
     //function
     const cancel = () => {
@@ -86,7 +87,7 @@ export default function ReservationDesc({route}){
                         <StyledReservationStatus status={status}>{reservationStatus[status]}</StyledReservationStatus>
                         {
                             status==1 || status==2 ? 
-                            <StyledReservationChange onPress={() => setCancelAlert('예약을 취소하시겠습니까??')}>예약취소</StyledReservationChange> : 
+                            <StyledReservationChange onPress={() => setConfirm(true)}>예약취소</StyledReservationChange> : 
                             (
                                 status==5 ? 
                                 <StyledReservationChange onPress={moveStore}>재방문</StyledReservationChange> 
@@ -95,8 +96,8 @@ export default function ReservationDesc({route}){
                         }
                     </StyledSectionRow>
                     <StyledSectionRow style={{justifyContent:'space-between', paddingBottom:0}}>
-                        <StyledStoreTitle>{reservation.store_name}</StyledStoreTitle>
-                        <StyledStoreButton name="chevron-forward-outline" size={20}/>
+                        <StyledStoreTitle onPress={moveStore} suppressHighlighting={true}>{reservation.store_name}</StyledStoreTitle>
+                        <StyledStoreButton name="chevron-forward-outline" size={20} onPress={moveStore} suppressHighlighting={true}/>
                     </StyledSectionRow>
                     <StyledSectionRow style={{paddingTop:0}}>
                         <StyledStoreAddr>{reservation.store_addr}</StyledStoreAddr>
@@ -127,33 +128,42 @@ export default function ReservationDesc({route}){
                         <StyledInfoData>{mobileMask(user.mb_cellphone)}</StyledInfoData>
                     </StyledSectionRow>                                                    
                 </StyledSection>                  
+                <StyledQRBox>
+                    <QRCode 
+                        value={String(reservationId)}
+                        logoSize={40}
+                        logoBackgroundColor='transparent'
+                        color='#333'
+                        size={200}
+                    />
+                </StyledQRBox>
             </StyledConatainer>
         )
     }, [reservation, user]);
 
-    const alertGear = useMemo(() => (
+    const confirmGear = useMemo(() => (
         <AwesomeAlert
             {...alertDefaultSetting}
-            show={cancelAlert ? true : false}
-            title={cancelAlert}
+            show={confirm}
+            title='예약을 취소하시겠습니까?'
             confirmText="예약취소"
             cancelText="아니오"
             onCancelPressed={() => {
-                setCancelAlert('');
+                setConfirm(false);
             }}
             onConfirmPressed={() => {
+                setConfirm(false);
                 cancel();
-                setCancelAlert('');
             }}
-            onDismiss={() => setCancelAlert('')}
+            onDismiss={() => setConfirm(false)}
         />
-    ), [cancelAlert]);
+    ), [confirm]);
 
     //render
     return (
         <>
             {reservationGear}
-            {alertGear}
+            {confirmGear}
         </>
     )
 }
@@ -230,4 +240,8 @@ const StyledInfoData = styled.Text`
     color:#333;
     font-size:14px;
     font-weight:500;
+`;
+const StyledQRBox = styled.View`
+    align-self:center;
+    top:40px;
 `;

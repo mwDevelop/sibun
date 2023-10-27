@@ -26,9 +26,34 @@ export { default as login_kakao } from "./login_kakao.png";
 export { default as login_apple } from "./login_apple.png";
 export { default as login_mobile } from "./login_mobile.png";
 
+export { default as korean_logo } from "./korean_logo.png";
+
 export { default as map_target } from "./map_target.png";
 export { default as map_list } from "./map_list.png";
 export { default as marker_wish } from "./marker_wish.png";
 
 export { default as welcome } from "./welcome.png";
+
+export { default as x_circle } from "./x_circle.png";
+export { default as picture_upload } from "./picture_upload.png";
+
+export { default as heart_empty } from "./heart_empty.png";
+export { default as heart_fill } from "./heart_fill.png";
+export { default as heart_flat_empty } from "./heart_flat_empty.png";
+export { default as heart_flat_fill } from "./heart_flat_fill.png";
+
+export { default as golf } from "./golf.png";
+export { default as golf_active } from "./golf_active.png";
+export { default as golf_heart } from "./golf_heart.png";
+export { default as golf_heart_active } from "./golf_heart_active.png";
+
+export { default as share } from "./share.png";
+
+export { default as intro_map } from "./intro_map.png";
+export { default as intro_coupon } from "./intro_coupon.png";
+export { default as intro_schedule } from "./intro_schedule.png";
+
+export { default as onerror } from "./onerror.png";
+
+
 

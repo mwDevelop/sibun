@@ -123,7 +123,7 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
                             top: extraChk ? -2 : 0,
                         },
                         text : { color: new Date(key).getDay() === 0 ? 'red' : '#2d4150'},
-                        renderUnder: () => bubbleCount(scheduleData[key].length)//to use this option, customized "renderUnderView()" function inside "react-native-calendars/src/calendar/day/basic/index.js"
+                        underView: () => bubbleCount(scheduleData[key].length)//to use this option, customized "renderUnder()" function inside "react-native-calendars/src/calendar/day/basic/index.js"
                     },
                 }
             }

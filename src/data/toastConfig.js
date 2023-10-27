@@ -34,6 +34,11 @@ export default toastConfig = {
             <StyledText>👿  {text1}</StyledText>
         </StyledView>
     ),            
+    plain: ({text1, props}) => (
+        <StyledView style={{backgroundColor:"#7D7D7D", borderRadius:10}}>
+            <StyledText style={{paddingTop:3, paddingBottom:3, paddingRight:15, paddingLeft:15, textAlign:'center'}}>{text1}</StyledText>
+        </StyledView>
+    ),            
 }
 
 //------------------------------- STYLE --------------------------------

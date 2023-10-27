@@ -17,7 +17,7 @@ export default function ReservationDone(){
     //render
     return (
         <StyledConatainer>
-            <ReservationListView data={reservation || {}} theme="gray"/>
+            <ReservationListView data={reservation} theme="gray"/>
         </StyledConatainer>
     );
 }

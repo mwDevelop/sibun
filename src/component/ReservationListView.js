@@ -2,36 +2,41 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import { numberToTime, timeToText } from '@/lib';
+import { useNavigation } from '@react-navigation/native';
 
 //---------------------------- COMPONENT -------------------------------
 //render
-export default React.memo(({data={}, theme="default"}) => {
-    //render
-    return Object.keys(data)?.length ? (
-        <StyledConatainer>
-            {
-                Object.keys(data).map((k, kIndex) => (
-                    <StyledSection key={kIndex}>
-                        <StyledSectionDate theme={theme}>{timeToText(new Date(k), 'yy.mm.dd')}</StyledSectionDate>
-                        {
-                            data[k].map((d, dIndex) => (
-                                <StyledItem key={dIndex}>
-                                    <StyledTime>
-                                        <StyledTimeText theme={theme}>{numberToTime(d.reservation_time)}</StyledTimeText>
-                                    </StyledTime>
-                                    <StyledInfo>
-                                        <StyledInfoName theme={theme}>{d.store_name}</StyledInfoName>
-                                        <StyledInfoAddr>{d.store_addr}</StyledInfoAddr>
-                                    </StyledInfo>
-                                </StyledItem>
-                            ))
-                        }
+export default React.memo(({data=null, theme="default"}) => {
+    //init
+    const navigation = useNavigation();
 
-                    </StyledSection>
-                ))                
-            } 
-        </StyledConatainer>
-    ) : (<StyledEmptyText>예약 내역이 없습니다.</StyledEmptyText>)
+    //render
+    return data ? (
+        Object.keys(data)?.length ? (
+            <StyledConatainer>
+                {
+                    Object.keys(data).map((k, kIndex) => (
+                        <StyledSection key={kIndex}>
+                            <StyledSectionDate theme={theme}>{timeToText(new Date(k), 'yy.mm.dd')}</StyledSectionDate>
+                            {
+                                data[k].map((d, dIndex) => (
+                                    <StyledItem key={dIndex} onPress={() => navigation.navigate('예약상세', {id:d.reservation_idx})}>
+                                        <StyledTime>
+                                            <StyledTimeText theme={theme}>{numberToTime(d.reservation_time)}</StyledTimeText>
+                                        </StyledTime>
+                                        <StyledInfo>
+                                            <StyledInfoName theme={theme}>{d.store_name}</StyledInfoName>
+                                            <StyledInfoAddr>{d.store_addr}</StyledInfoAddr>
+                                        </StyledInfo>
+                                    </StyledItem>
+                                ))
+                            }
+                        </StyledSection>
+                    ))                
+                } 
+            </StyledConatainer>
+        ) : (<StyledEmptyText>예약 내역이 없습니다.</StyledEmptyText>)
+    ) : null
 });
 
 //------------------------------- STYLE --------------------------------
@@ -53,11 +58,9 @@ const StyledConatainer = styled.ScrollView`
     background:white;
 `;
 const StyledEmptyText = styled.Text`
+    margin-top:50px;
     align-self:center;
-    margin-top:60%;
-    color:#444;
-    font-size:16px;
-    font-weight:500;
+    color:#222;
 `;
 const StyledSection = styled.View`
     margin:10px 15px;
@@ -68,7 +71,7 @@ const StyledSectionDate = styled.Text`
     font-size:12px;
     font-weight:400;
 `;
-const StyledItem = styled.View`
+const StyledItem = styled.TouchableOpacity`
     border-width:1px;
     border-color:#D7D7D7;
     border-radius:8px;

@@ -30,13 +30,14 @@ export const reservationStatus = [
     '이용완료',
 ];
 
-export const defaultLocation = {latitude: 37.576044, longitude: 126.977019, zoom: 14}; //Gwanghwamun
-
-export const rangeSet = { //zoom : [longitude, latitude]
-    16:[0.002, 0.0025],
-    15:[0.0038, 0.005],
-    14:[0.007, 0.01],
+export const errorToast = {
+    type: 'bad',
+    text1: '현재 지원하지 않는 기능입니다.',
+    topOffset: 120,
+    visibilityTime: 1000
 };
+
+export const defaultLocation = {latitude: 37.576044, longitude: 126.977019, zoom: 14}; //Gwanghwamun
 
 export const alertDefaultSetting = { 
     showProgress:false,

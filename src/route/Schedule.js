@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useReservation } from '@/hooks';
 import { numberToTime } from '@/lib';
 import { useNavigation } from '@react-navigation/native';
+import { CustomInnerLoading } from '@/component';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Schedule(){
@@ -58,6 +59,7 @@ export default function Schedule(){
                         reservation[chkDate].map((item, index) => {
                             const from = numberToTime(item.reservation_time);
                             const until = numberToTime(Number(item.reservation_time) + Number(item.reservation_period));
+                            const cancelFlag = item.reservation_stt == 3;
                             return (
                                 <StyledListItem key={index}>
                                     <StyledItemName>
@@ -69,9 +71,9 @@ export default function Schedule(){
                                     <StyledItemTime>
                                         <StyledTimeIcon name="clock-time-four-outline"/><Text> {from} - {until}</Text>
                                     </StyledItemTime>
-                                    <StyledItemDesc onPress={() => navigation.navigate('예약상세', {id:item.reservation_idx})}>
-                                        <StyledItemDescText>
-                                            상세보기
+                                    <StyledItemDesc onPress={() => navigation.navigate('예약상세', {id:item.reservation_idx})} style={cancelFlag ? {borderColor:'#888'} : null}>
+                                        <StyledItemDescText style={cancelFlag ? {color:'#888'} : null} >
+                                            {cancelFlag ? '취소완료' : '상세보기'}
                                         </StyledItemDescText>
                                     </StyledItemDesc>
                                 </StyledListItem>
@@ -87,6 +89,7 @@ export default function Schedule(){
     //render
     return(
         <StyledConatainer>
+            <CustomInnerLoading delay={1000}/>
             <StyledCalendarSection>
                 {calendarGear}
             </StyledCalendarSection>
@@ -122,7 +125,7 @@ const StyledDayText = styled.Text`
 const StyledListBar = styled.View`
     position:absolute;
     width:1.5px;
-    height:2000px;
+    height:3000px;
     border-color: #999;
     border-left-width: 1.5px;
     left:32px;

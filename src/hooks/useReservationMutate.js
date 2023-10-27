@@ -19,7 +19,6 @@ export default function useReservationMutate(){
         },
         onSuccess: (res) => {
             if(res.data.result == "000"){
-                console.log('success');
                 queryClient.invalidateQueries(queryKey);
             }else{
                 console.log(`-------${queryKey}-------`);

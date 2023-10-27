@@ -7,6 +7,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { alertDefaultSetting } from '@/data/constants';
 import { logout } from '@/lib';
 import { useUserMutate } from '@/hooks';
+import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Leave(){
@@ -135,13 +136,13 @@ const StyledConatainer = styled.View`
     background:white;
 `;
 const StyledHeader = styled.View`
-    height:180px;
+    height:${rh*170}px;
     justify-content:center;
 `;
 const StyledHeaderTitle = styled.Text`
-    font-size:25px;
+    font-size:${rw*24}px;
     font-weight:600;
-    padding:0 20px;
+    padding:0 ${rw*20}px;
     color:#222;
 `;
 const StyledHighLightText = styled.Text`
@@ -150,8 +151,8 @@ const StyledHighLightText = styled.Text`
 const StyledBody = styled.View`
     flex:0.9;
     justify-content:space-between;
-    padding: 0 35px;
-    padding-bottom: 100px;
+    padding: 0 ${rw*34}px;
+    padding-bottom: ${rh*95}px;
 `;
 const StyledItem = styled.TouchableOpacity`
     flex-direction:row;
@@ -159,24 +160,24 @@ const StyledItem = styled.TouchableOpacity`
     justify-content:space-between;
 `;
 const StyledItemTitle = styled.Text`
-    font-size:16px;
+    font-size:${rw*14}px;
     color:#222;
     font-weight:500;
 `;
 const StyledItemCheckBox = styled.View`
     background:${(props) => props.checked ? '#F33562':'#F1F1F1'};
     border-radius:15px;
-    width:20px;
-    height:20px;
+    width:${rw*18}px;
+    height:${rw*18}px;
     align-items:center;
 `;
 const StyledItemChkIcon = styled(Icon)`
-    font-size:18px;
+    font-size:${rw*16}px;
     color:${(props) => props.checked ? '#FFF':'#B8B8B8'};
-    margin-top:2px;
+    margin-top:${rh*1}px;
 `;
 const StyledFooter = styled.View`
-    height:90px;
+    height:${rh*80}px;
 `;
 const StyledSubmitButton = styled.TouchableOpacity`
     background:#222;
@@ -186,6 +187,6 @@ const StyledSubmitButton = styled.TouchableOpacity`
 `;
 const StyledSubmitButtonText = styled.Text`
     color:white;
-    font-size:20px;
+    font-size:${rw*19}px;
     font-weight:500;
 `;

@@ -12,6 +12,7 @@ import { ProfileEditSaveAtom } from '@/data/global';
 import { useRecoilState } from "recoil";
 import Toast from 'react-native-toast-message';
 import { useUser, useUserMutate } from '@/hooks';
+import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ProfileEdit(){
@@ -99,15 +100,15 @@ export default function ProfileEdit(){
             mb_gender: gender,
             mb_profile_img: profileImg,
             mb_birth: birth,
-            mb_email: mailFront+"@"+mailRear,
+            mb_email: (mailFront && mailRear) ? (mailFront+"@"+mailRear) : null,
         };
 
         userMutation.mutate({type:"modify", params:params}, {onSuccess: async(res) => {
             if(res.data.result == "000"){
                 Toast.show({
                     type: 'good',
-                    text1: '저장되었습니다!',
-                    topOffset: 120,
+                    text1: '프로필 정보가 변경되었습니다!',
+                    topOffset: rh*120,
                     visibilityTime: 1000
                 });
             }else{
@@ -165,6 +166,7 @@ export default function ProfileEdit(){
             <StyledSection>
                 <StyledSectionTitle>휴대폰번호</StyledSectionTitle>
                 <StyledInput onFocus={() => setFocusOffset(100)} maxLength={13} returnKeyType={'done'} keyboardType='numeric' value={mobileMask(phone)} onChangeText={(text) => setPhone(numberFilter(text))} />
+                <StyledInputBox>
                 <StyledInput onFocus={() => setFocusOffset(100)} maxLength={6} returnKeyType={'done'} keyboardType='numeric' value={pin} onChangeText={(text) => setPin(numberFilter(text))} />
                 {
                     phoneChk == "ing" || phoneChk == "certFail" ? (
@@ -184,6 +186,7 @@ export default function ProfileEdit(){
                 <StyledInnerButton onPress={() => {sendCert(phone)}}>
                     <StyledInnerButtonText>인증번호 발송</StyledInnerButtonText>
                 </StyledInnerButton>
+                </StyledInputBox>
                 <StyledOuterButton disabled={!chkEnabled} activeChk={chkEnabled} onPress={() => checkCert(/* 작업중 */)}>
                     <StyledOuterButtonText activeChk={chkEnabled}>인증확인</StyledOuterButtonText>
                 </StyledOuterButton>
@@ -199,32 +202,33 @@ export default function ProfileEdit(){
                 <StyledEmailArea>
                     <StyledEmailFront onFocus={() => setFocusOffset(100)} value={mailFront} onChangeText={(text) => setMailFront(specialCharFilter(text))}/>
                     <StyledEmailMiddle>@</StyledEmailMiddle>
-                    {!initMailId ? <View style={{height:50, width:180}}/> : (
-                    <AutocompleteDropdown
-                        onFocus={() => setFocusOffset(100)}
-                        clearOnFocus={false}
-                        closeOnBlur={true}
-                        closeOnSubmit={false}
-                        initialValue={initMailId}
-                        onSelectItem={(item) => setMailRear(item && item.title)}
-                        onClear={(i) => {if(i === undefined) setMailRear(null)}}
-                        onChangeText={(text) => setMailRear(text)}
-                        dataSet={realMailList}
-                        ClearIconComponent={null}
-                        textInputProps={{
-                            placeholder: 'example.com',
-                        }}                        
-                        inputContainerStyle={{
-                            backgroundColor: '#fff',
-                            borderRadius: 5,
-                            height:50,
-                            borderColor:'#eee',
-                            borderWidth:1,
-                            width:180,
-                            alignItems:"center"
-                        }}
-                    />                               
-                    )}
+                    {
+                        initMailId !== null ? 
+                        <AutocompleteDropdown
+                            onFocus={() => setFocusOffset(100)}
+                            clearOnFocus={false}
+                            closeOnBlur={true}
+                            closeOnSubmit={false}
+                            initialValue={initMailId}
+                            onSelectItem={(item) => setMailRear(item && item.title)}
+                            onClear={(i) => {if(i === undefined) setMailRear(null)}}
+                            onChangeText={(text) => setMailRear(text)}
+                            dataSet={realMailList}
+                            ClearIconComponent={null}
+                            textInputProps={{
+                                placeholder: 'example.com',
+                            }}                        
+                            inputContainerStyle={{
+                                backgroundColor: '#fff',
+                                borderRadius: 5,
+                                height:rh*48,
+                                borderColor:'#eee',
+                                borderWidth:1,
+                                width:rw*160,
+                                alignItems:"center"
+                            }}
+                        /> : null
+                    }                               
                 </StyledEmailArea>
             </StyledSection>
         );
@@ -235,6 +239,7 @@ export default function ProfileEdit(){
         return (
             <DatePicker
                 modal
+                locale='ko-KR'
                 open={dateModalOpen}
                 date={selectedDate}
                 mode="date"
@@ -273,6 +278,8 @@ export default function ProfileEdit(){
                     setRealMailList([...realMailList, {id:mailArr[1], title:mailArr[1]}]);
                     setInitMailId(mailArr[1]);
                 } 
+            }else{
+                setInitMailId('');
             }
         }catch(e){
             console.log(e);
@@ -293,7 +300,6 @@ export default function ProfileEdit(){
     useLayoutEffect(() => {
         if(phoneChk == "refresh") setPhoneChk("ing");
     }, [phoneChk]);
-
     
     useLayoutEffect(() => { //save chk
         if(
@@ -315,7 +321,7 @@ export default function ProfileEdit(){
     return(
         <StyledWindow>
             <StyledConatainer>
-                <KeyboardAvoidingView behavior={Platform.OS == "ios" ? 'position' : null} keyboardVerticalOffset={focusOffset}>
+                <KeyboardAvoidingView behavior={'position'/*Platform.OS == "ios" ? 'position' : null*/} keyboardVerticalOffset={focusOffset}>
                 {profileImgGear}
                 {nameGear}
                 {genderGear}
@@ -335,58 +341,60 @@ const StyledWindow = styled.ScrollView`
     flex:1;
 `;
 const StyledConatainer = styled.View`
-    margin:10px 20px;
+    margin:${rh*10}px ${rw*20}px;
 `;
 const StyledSection = styled.View`
-    margin:8px 0;
+    margin:${rh*7}px 0;
 `;
 const StyledSectionTitle = styled.Text`
     color:#7D7D7D;
-    margin:3px 0;
+    margin:${rh*2.5}px 0;
 `;
 const StyledInput = styled.TextInput`
-    height:50px;
+    height:${rh*48}px;
     border-color:#eee;
     border-width:1px;
     border-radius:5px;
-    padding:0 18px;
-    margin:5px 0;
+    padding:0 ${rw*17}px;
+    margin:${rh*5}px 0;
 `;
 const StyledInnerButton = styled.TouchableOpacity`
     position:absolute;
-    top:40.5%;
+    top:18%;
     right:2%;
     border-color:#D9D9D9;
     border-width:1px;
-    padding:10px;
-    border-radius:20px;
+    padding:${rw*10}px;
+    border-radius:${rw*20}px;
+`;
+const StyledInputBox = styled.View`
 `;
 const StyledInnerButtonText = styled.Text`
     color:#444;
 `;
 const StyledOuterButton = styled.TouchableOpacity`
-    height:50px;
+    height:${rh*49}px;
     align-items:center;
     justify-content:center;
     background:${(props) => props.activeChk ? "#444" : "#F0F0F0"};
-    border-radius:5px;
-    margin:5px 0;
+    border-radius:${rh*5}px;
+    margin:${rh*5}px 0;
 `;
 const StyledOuterButtonText = styled.Text`
     color:${(props) => props.activeChk ? "#FFF" : "#BBB"};
 `;
 const StyledInputMessage = styled.Text`
     color:${(props) => props.passed ? '#2D5198' : 'red'};
-    font-size:10px;
+    font-size:${rw*10}px;
     font-weight:600;
-    margin: 2px 0;
+    margin: ${rw*2}px 0;
 `;
 const StyedButtonArea = styled.View`
-    margin-top:5px;
+    margin-top:${rh*5}px;
     flex-direction:row;
     border-width:1px;
     border-color:#eee;
-    width:130px;
+    width:${rw*130}px;
     border-radius:5px;
     align-items:center;
     overflow:hidden;
@@ -394,40 +402,40 @@ const StyedButtonArea = styled.View`
 const StyledButtonText = styled.Text`
     background:${(props) => props.selected? '#F33562': '#fff'};
     color:${(props) => props.selected? '#fff': '#555'};
-    width:64px;
+    width:${rw*64}px;
     text-align:center;
-    line-height:50px;
+    line-height:${rh*43}px;
     font-weight:600;
 `;
 const StyledEmailArea = styled.View`
     flex-direction:row;
-    height:50px;
+    height:${rh*49}px;
     border-color:#fff;
     border-width:1px;
     border-radius:5px;
-    margin:5px 0;
+    margin:${rh*5}px 0;
     align-items:center;
 `;
 const StyledEmailFront = styled.TextInput`
-    height:50px;
+    height:${rh*48}px;
     border-color:#eee;
     border-width:1px;
     border-radius:5px;
     flex:0.8;
-    padding:0 18px;
+    padding:0 ${rw*18}px;
 `;
 const StyledEmailMiddle = styled.Text`
     flex:0.2;
     text-align:center;
-    font-size:20px;
+    font-size:${rw*20}px;
     color:#555;
 `;
 const StyledBirthText = styled.Text`
-    height:50px;
+    height:${rh*48}px;
     border-color:#eee;
     border-width:1px;
     border-radius:5px;
-    padding:0 18px;
-    margin:5px 0;
-    line-height:48px;
+    padding:0 ${rw*17}px;
+    margin:${rh*5}px 0;
+    line-height:${rh*44}px;
 `;

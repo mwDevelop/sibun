@@ -11,6 +11,7 @@ import { apiCall, mobileMask, numberFilter, specialCharFilter, login, timeToText
 import uuid from 'react-native-uuid';
 import { useUserMutate } from '@/hooks';
 import Modal from 'react-native-modalbox';
+import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Join({route}){
@@ -30,9 +31,9 @@ export default function Join({route}){
     }; //default datas
     const endPage = 2;
     const titleList = [
-        "휴대폰번호를\n인증해 주세요",
-        "정보를\n입력해 주세요",
-        "이메일을\n입력해 주세요",
+        ["휴대폰번호를\n인증해 주세요", "required"],
+        ["정보를\n입력해 주세요", "required"],
+        ["이메일을\n입력해 주세요", "selective"],
     ];
 
     //ref
@@ -76,7 +77,7 @@ export default function Join({route}){
             mb_gender: gender,
             mb_birth: birth,
             mb_profile_img: profileImg,
-            mb_email: mailFront+"@"+mailRear,
+            mb_email: (mailFront && mailRear) ? mailFront+"@"+(mailRear) : null,
             mb_marketing_yn: terms[2].selected ? "y" : "n"
         };
 
@@ -182,8 +183,25 @@ export default function Join({route}){
     const phoneGear = useMemo(() => {
         return (
             <>
-                <StyledInput returnKeyType={'done'} maxLength={13} keyboardType='numeric' value={mobileMask(phone)} onChangeText={(text) => setPhone(numberFilter(text))} placeholder="휴대폰 번호 입력"/>
-                <StyledInput returnKeyType={'done'} maxLength={6} keyboardType='numeric' value={pin} onChangeText={(text) => setPin(numberFilter(text))} placeholder="인증번호"/>
+                <StyledInput 
+                    returnKeyType={'done'} 
+                    maxLength={13} 
+                    keyboardType='numeric' 
+                    value={mobileMask(phone)} 
+                    onChangeText={(text) => 
+                    setPhone(numberFilter(text))} 
+                    placeholder="휴대폰 번호 입력"
+                    placeholderTextColor='#aaa'
+                />
+                <StyledInput 
+                    returnKeyType={'done'} 
+                    maxLength={6} 
+                    keyboardType='numeric' 
+                    value={pin} 
+                    onChangeText={(text) => setPin(numberFilter(text))} 
+                    placeholder="인증번호" 
+                    placeholderTextColor='#aaa'
+                />
                 {
                     phoneChk == "ing" || phoneChk == "certFail" || phoneChk == "isNotCert" ? (
                         <StopWatch 
@@ -193,7 +211,7 @@ export default function Join({route}){
                                 position:'absolute',
                                 color:'#FF3A46',
                                 top:'60%',
-                                right:'35%'
+                                right:'40%'
                             }}
                             endEvent = {() => setPhoneChk("certOver")}
                         />                           
@@ -212,8 +230,10 @@ export default function Join({route}){
         return (
             <>
                 <ProfileImage src={profileImg} changeHandler={setProfileImg}/>
-                <StyledInput ref={nameInput} value={name} onChangeText={(text) => setName(text)} placeholder="이름" style={{marginTop:25}}/>
-                <StyledInput onPressIn={() => setDateModalOpen(true)} value ={timeToText(targetDate, 'y  /  mm  /  dd')} placeholder="생년월일"/>
+                <StyledInput ref={nameInput} value={name} onChangeText={(text) => setName(text)} placeholder="이름" placeholderTextColor="#aaa" style={{marginTop:25}}/>
+                <StyledDateText onPress={() => setDateModalOpen(true)} style={{color : targetDate ? 'black' : '#aaa'}} suppressHighlighting={true}>
+                    {targetDate ? timeToText(targetDate, 'y  /  mm  /  dd') : '생년월일'}
+                </StyledDateText>
                 <StyledButtonArea>
                     <StyledButtonText selected={gender == "m"} onPress={() => setGender('m')} suppressHighlighting={true}>남자</StyledButtonText>
                     <StyledButtonText selected={gender == "w"} onPress={() => setGender('w')} suppressHighlighting={true}>여자</StyledButtonText>
@@ -241,14 +261,15 @@ export default function Join({route}){
                         dataSet={mailList}
                         textInputProps={{
                             placeholder: 'example.com',
+                            placeholderTextColor:"#aaa"
                         }}                        
                         inputContainerStyle={{
                             backgroundColor: '#fff',
                             borderRadius: 5,
-                            height:50,
+                            height:rh*45,
                             borderColor:'#eee',
-                            borderWidth:1,
-                            width:170,
+                            borderWidth:rw*1,
+                            width:rw*170,
                             alignItems:"center",
                         }}
                     />    
@@ -262,12 +283,13 @@ export default function Join({route}){
         return (
             <DatePicker
                 modal
+                locale='ko-KR'
                 open={dateModalOpen}
                 date={selectedDate}
                 mode="date"
                 onConfirm={(date) => {
-                    setDateModalOpen(false);
                     setBirth(date);
+                    setDateModalOpen(false);
                 }}
                 onCancel={() => {
                     setDateModalOpen(false)
@@ -306,7 +328,8 @@ export default function Join({route}){
             <StyledHeader>
                 <StyledHeaderTitle>
                     <StyledHeaderTitleText>
-                        {titleList[page]}
+                        {titleList[page][0]}
+                        <StyledRequired>  ({titleList[page][1] == 'required' ? '필수' : '선택'})</StyledRequired>
                     </StyledHeaderTitleText>
                 </StyledHeaderTitle>                    
                 <StyledHeaderPage>
@@ -327,8 +350,8 @@ export default function Join({route}){
                     <StyledFooterNextIcon name="chevron-forward"/>
                 </StyledFooterNext>
             </StyledFooter>
-            {dateModalGear}
-            {termsModalGear}
+            {page == 1 ? dateModalGear : null}
+            {page == 2 ? termsModalGear : null}
         </StyledConatainer>
     )
 }
@@ -337,7 +360,7 @@ export default function Join({route}){
 const StyledConatainer = styled.View`
     flex:1;
     background:white;
-    padding:10px 20px;
+    padding:${rh*10}px ${rw*20}px;
 `;
 const StyledHeader = styled.View`
     flex:0.15;
@@ -348,7 +371,7 @@ const StyledHeader = styled.View`
 const StyledHeaderTitle = styled.View`
 `;
 const StyledHeaderTitleText = styled.Text`
-    font-size:20px;
+    font-size:${rw*20}px;
     font-weight:600;
 `;
 const StyledHeaderPage = styled.View`
@@ -356,12 +379,12 @@ const StyledHeaderPage = styled.View`
 `;
 const StyledHeaderPageFront = styled.Text`
     color:#F33562;
-    font-size:16px;
+    font-size:${rw*16}px;
     font-weight:500;
 `;
 const StyledHeaderPageRear = styled.Text`
     color:#7D7D7D;
-    font-size:16px;
+    font-size:${rw*16}px;
     font-weight:500;
 `;
 const StyledBody = styled.View`
@@ -376,22 +399,31 @@ const StyledFooterNext = styled.TouchableOpacity`
     align-items:center;
 `;
 const StyledFooterNextText = styled.Text`
-    font-size:16px;
+    font-size:${rw*16}px;
     font-weight:500;
 `;
 const StyledFooterNextIcon = styled(Icon)`
-    font-size:24px;
-    margin-left:10px;
+    font-size:${rw*24}px;
+    margin-left:${rw*10}px;
 `;
 const StyledSection = styled.View`
 `;
 const StyledInput = styled.TextInput`
     width:100%;
-    height:50px;
+    height:${rh*45}px;
     background:#ECECEC;
     border-radius:5px;
-    margin:5px 0;
-    padding:0 20px;
+    margin:${rw*5}px 0;
+    padding:0 ${rw*20}px;
+`;
+const StyledDateText = styled.Text`
+    width:100%;
+    line-height:${rh*43}px;
+    background:#ECECEC;
+    border-radius:5px;
+    margin:${rw*5}px 0;
+    padding:0 ${rw*20}px;
+    overflow:hidden;
 `;
 const StyledEmailArea = styled.View`
     flex-direction:row;
@@ -399,35 +431,36 @@ const StyledEmailArea = styled.View`
 `;
 const StyledEmailMiddleText = styled.Text`
     text-align:center;
-    font-size:20px;
+    font-size:${rw*20}px;
     color:#555;
-    line-height:50px;
+    line-height:${rh*50}px;
     flex:0.2;
+    margin:0 ${rw*3}px;
 `;
 const StyledInnerButton = styled.TouchableOpacity`
     background: #fff;
     position:absolute;
-    top:53%;
+    top:51%;
     right:5%;
-    border-radius:50px;
-    padding:10px;
+    border-radius:${rw*50}px;
+    padding:${rh*10}px;
     border-width:1px;
     border-color:#D9D9D9;
 `;
 const StyledInnerButtonText = styled.Text`
     color:#444;
-    font-size:12px;
+    font-size:${rw*12}px;
 `;
 const StyledInputMessage = styled.Text`
     color:${(props) => props.passed ? '#2D5198' : 'red'};
-    font-size:10px;
+    font-size:${rw*10}px;
     font-weight:600;
-    margin: 2px 0;
+    margin: ${rw*2}px 0;
 `;
 const StyledButtonArea = styled.View`
     flex-direction:row;
     justify-content:space-between;
-    margin: 5px 0;
+    margin: ${rh*5}px 0;
 `;
 const StyledButtonText = styled.Text`
     width:48%;
@@ -436,28 +469,33 @@ const StyledButtonText = styled.Text`
     overflow:hidden;
     background:${(props) => props.selected ? "#F33562" : "#fff"};
     color:${(props) => props.selected ? "#fff" : "#222"};;
-    border-width:1px;
+    border-width:${rw*1}px;
     border-color:#D9D9D9;
-    font-size:14px;
+    font-size:${rw*14}px;
     font-weight:400;
     text-align:center;
 `;
 const StyledTermsModal = styled(Modal)`
-    height:300px;
-    border-top-right-radius:25px;
-    border-top-left-radius:25px;
+    height:${rh*255}px;
+    border-top-right-radius:${rw*25}px;
+    border-top-left-radius:${rw*25}px;
+    top:${rh*10}px;
 `;
 const StyledTermsView = styled.View`
-    padding:20px;
+    padding:${rh*20}px;
 `;
 const StyledSubmit = styled.Text`
     border-radius:5px;
-    line-height:48px
+    line-height:${rw*40}px
     background:#F33562;
     overflow:hidden;
     text-align:center;
     color:#fff;
-    font-size:16px;
+    font-size:${rw*15}px;
     font-weight:600;
-    margin-top:20px;
+    margin-top:${rh*20}px;
+`;
+const StyledRequired = styled.Text`
+    color:#999;
+    font-size:${rw*13}px;
 `;

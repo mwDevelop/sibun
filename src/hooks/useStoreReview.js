@@ -3,17 +3,17 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiCall } from '@/lib';
 
 //----------------------------- FUNCTION -------------------------------
-export default function useReview(id){
+export default function useStoreReview(id){
     //init
     const queryClient = useQueryClient();
-    const defaultKey = `review`;
+    const defaultKey = `store_review`;
     const queryKey = [defaultKey];
     queryKey.push('id');
     queryKey.push(id);      
     const queryUrl = `/store/${id}/review`;
 
     //query
-    const reviewData = useQuery(
+    const storeReviewData = useQuery(
         queryKey, 
         () => apiCall.get(queryUrl).then(( res ) => {
             if(res.data.result == "000") return res.data.list;
@@ -29,5 +29,5 @@ export default function useReview(id){
     const goStale = () => queryClient.invalidateQueries({queryKey : queryKey, refetchType: 'none'});
     
     //return
-    return [reviewData.data, reviewData.refetch, goStale];
+    return [storeReviewData.data, storeReviewData.refetch, goStale];
 }

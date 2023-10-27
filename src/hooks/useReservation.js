@@ -24,7 +24,9 @@ export default function useReservation(id = null, params = null){
         queryKey, 
         () => apiCall.get( queryUrl, {params: params, headers: headers} ).then(( res ) => {
             if(res.data.result == "000") return id ? res.data.data : res.data.list;
-            else {
+            else if(res.data.result == "001"){
+                return id ? null : (params?.type? {} : []);
+            }else{
                 console.log(queryKey);
                 console.log(res.data.result);
                 return null;

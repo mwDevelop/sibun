@@ -6,7 +6,9 @@ import { CustomInnerLoading, ImageCarousel, CustomCarousel } from '@/component';
 import { useLayoutEffect, useMemo } from 'react';
 import FastImage from 'react-native-fast-image';
 import { useBanner, useCategory, useStore, useUser } from '@/hooks';
-import { defaultImage } from '@/data/constants';
+import { timeToNumber } from '@/lib';
+import { korean_logo, onerror } from '@/assets/img';
+import { rh, rw } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Home(){
@@ -17,12 +19,11 @@ export default function Home(){
     //data
     const [ banners, bannersUpdate ] = useBanner();
     const [ category, categoryUpdate ] = useCategory();
-    const [ visited, visitedUpdate ] = useStore();
+    const [ available, availableUpdate ] = useStore(null, {store_oper_time:timeToNumber(new Date()), rpp:10});
     const [ user, userUpdate ] = useUser();
 
     //function
     const tokenCheck = async() => {
-        //visitedUpdate();
         /*
         const headers = {"Authorization" : "access"};
         const testResult = await apiCall.get(`/user/me`, {headers});
@@ -35,7 +36,7 @@ export default function Home(){
     const nowListTemplate = (info, index) => {
         return (
             <StyledNowTemplateView key={index} activeOpacity={1} onPress={() => navigation.navigate('Desc', info)}>
-                <StyledNowTemplateImage source={{uri:info.store_main_simg || defaultImage}} resizeMode="contain"/>
+                <StyledNowTemplateImage source={{uri:info.store_main_simg}} defaultSource={onerror} resizeMode="contain"/>
                 <StyledNowTemplateTitle>{info.store_name}</StyledNowTemplateTitle>
                 <StyledNowTemplateSub>{info.store_addr}</StyledNowTemplateSub>
                 <StyledNowTemplateCnt>
@@ -50,14 +51,18 @@ export default function Home(){
     //memo
     const headerGear = useMemo(() => (
         <StyledHeader>
-                <StyledHeaderTitleText onPress={tokenCheck}>SUNTALK</StyledHeaderTitleText>
+                <StyledHeaderImage source={korean_logo} resizeMode='contain'/>
+                {
+                /*
                 <StyledHeaderSubText onPress={() => openModal()}>광진구 중곡동 156-6 <Icon name="caret-down-sharp" /></StyledHeaderSubText>
-                <StyledHeaderSearchIcon name ="md-search-outline" onPress={() => openModal()}/>
+                <StyledHeaderSearchIcon name ="md-search-outline" onPress={() => openModal()}/>                    
+                */
+                }
         </StyledHeader>
     ), []);
 
     const bannerGear = useMemo(() => banners?.length ? (
-        <StyledSection style={{height:200}}>
+        <StyledSection style={{height:rh*180}}>
             <ImageCarousel data={banners.map((i) => i.bn_img_src)} renderStyle={{borderRadius:10}} slideGap={60} carouselOption={{loop:true}}/>
         </StyledSection>
     ): null, [banners]);
@@ -86,29 +91,28 @@ export default function Home(){
         </StyledSection>        
     ), [category]);
 
-    const nowListGear = useMemo(() => !visited ? null : (
+    const nowListGear = useMemo(() => !available ? null : (
         <StyledSection>
             <StyledSectionHeader>                
                 <StyledSectionTitle>지금 바로 {<StyledHighLight>예약가능한</StyledHighLight>} 매장</StyledSectionTitle>
-                <StyledSectionHeaderRear><Icon name="refresh" size={20}/></StyledSectionHeaderRear>
+                <StyledSectionHeaderRear><Icon name="refresh" size={rw*19}/></StyledSectionHeaderRear>
             </StyledSectionHeader>
             <StyledSectionContent style={{padding:0}}> 
                 {
-                    <CustomCarousel carouselOption={{itemWidth:150}}>
-                        {visited.map((i, index) => nowListTemplate(i, index))}
+                    <CustomCarousel carouselOption={{itemWidth:rw*140}}>
+                        {available.map((i, index) => nowListTemplate(i, index))}
                     </CustomCarousel>
                 }
             </StyledSectionContent>
         </StyledSection>
-    ), [visited]);
+    ), [available]);
 
     //effect
     useLayoutEffect(() => {
         if(isFocused){
-            console.log('focused');
             bannersUpdate();
             categoryUpdate();
-            visitedUpdate();
+            availableUpdate();
             userUpdate();
         } 
     }, [isFocused]);
@@ -128,7 +132,6 @@ export default function Home(){
                 {/* --------------------- SECTION 3 ---------------------- */}                
                 
                 {/* --------------------- SECTION 4 ---------------------- */}                
-                
             </StyledConatainer>
         </StyledWindow>
     );
@@ -140,93 +143,94 @@ const StyledWindow = styled.ScrollView`
 `;
 const StyledConatainer = styled.View`
     flex-direction:column;
-    padding:20px 0px;
+    padding:${rh*20}px 0px;
 `;
 const StyledHeader = styled.View`
     flex-direction:row;
     justify-content:space-between;
     align-items:flex-end;
-    padding: 0 20px;
+    padding: 0 ${rw*20}px;
 `;
-const StyledHeaderTitleText = styled.Text`
-    font-weight:500;
-    font-size:30px;  
+const StyledHeaderImage = styled(FastImage)`
+    width:${rw*100}px;  
+    height:${rh*50}px;  
+    margin-left:${rw*10}px;
 `;
 const StyledHeaderSubText = styled.Text`
-    padding-bottom: 4px;
+    padding-bottom: ${rh*4}px;
     right:15px;
 `;
 const StyledHeaderSearchIcon = styled(Icon)`
-    font-size:25px;
+    font-size:${rh*25}px;
     padding-bottom: 4px;
 `;
 const StyledSection = styled.View`
-    margin: 10px 0px;
+    margin: ${rh*10}px 0px;
     justify-content:center;
 `;
 const StyledSectionHeader = styled.View`
     flex-direction:row;
     justify-content:space-between;
-    padding: 5px 20px;
+    padding: ${rh*5}px ${rw*20}px;
 `;
 const StyledSectionTitle = styled.Text`
-    font-size:20px;
+    font-size:${rw*20}px;
     font-weight:600;
 `;
 const StyledSectionHeaderRear = styled.Text`
-    font-size:13px;
+    font-size:${rw*13}px;
+    top:${rh*4}px;
 `;
 const StyledHighLight = styled.Text`
     color:#F33562;
 `;
 const StyledSectionContent = styled.View`
-    margin:5px 0;
+    margin:${rh*5}px 0;
 `;
-
 const StyledCategoryRow = styled.View`
     flex-direction:row;
-    margin:5px 20px;
+    margin:${rh*5}px ${rw*20}px;
     align-items:center;
 `;
 const StyledCategoryItems = styled.TouchableOpacity`
-    margin-right:20px;
+    margin-right:${rw*20}px;
     align-items:center;
     flex-direction:column;
 `;
 const StyledCategoryIconView = styled.View`
     background:#f1f1f1;
-    padding:8px;
+    padding:${rw*8}px;
     border-radius:8px;
 `;
 const StyledCategoryImg = styled(FastImage)`
-    width:50px;
-    height:50px;  
+    width:${rw*48}px;
+    height:${rw*48}px;  
 `;
 const StyledCategoryText = styled.Text`
-    margin:5px 0;
+    margin:${rw*5}px 0;
     font-weight:600;
 `;
 
 const StyledNowTemplateView = styled.TouchableOpacity`
-    padding-left:20px;
+    padding-left:${rw*20}px;
 `;
 const StyledNowTemplateImage = styled(FastImage)`
-    height:130px;
+    height:${rh*120}px;
     background:black;
     border-radius:8px;
 `;
 const StyledNowTemplateTitle = styled.Text`
     font-weight:500;
     color:#222;
-    padding-top:5px;
+    padding-top:${rw*5}px;
 `;
 const StyledNowTemplateSub = styled.Text`
     font-weight:500;
     color:#7D7D7D;
-    font-size:12px;
-    padding-top:5px;
+    font-size:${rw*12}px;
+    padding-top:${rh*5}px;
 `;
 const StyledNowTemplateCnt = styled.Text`
-    padding-top:5px;
-    font-size:12px;
+    padding-top:${rh*5}px;
+    font-size:${rw*11}px;
 `;

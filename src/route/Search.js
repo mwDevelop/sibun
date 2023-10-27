@@ -1,18 +1,28 @@
 //------------------------------ MODULE --------------------------------
-import { useState, useMemo, useLayoutEffect } from 'react';
-import { MapView, SelectModal, StoreListModal } from '@/component';
+import { useState, useMemo, useLayoutEffect, useRef } from 'react';
+import { MapView, SelectModal, StoreListView, SearchView } from '@/component';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { rangeSet } from '@/data/constants';
 import { defaultLocation } from '@/data/constants';
 import { apiCall } from '@/lib';
-import { useCategory } from '@/hooks';
+import { useCategory, useLike } from '@/hooks';
 import { timeToNumber } from '@/lib';
+import { Animated } from 'react-native';
+import Modal from 'react-native-modalbox';
 
 //---------------------------- COMPONENT -------------------------------
-export default function Search(){
+export default function Search({route}){
+    //init
+    const searchBarWidth = useRef(new Animated.Value(100)).current;
+    const inputRange = [80, 100];
+    const outputRange = ["80%", "100%"];
+    const searchBarAnimation = searchBarWidth.interpolate({inputRange, outputRange});
+    const searchBarRef = useRef();
+    const targetStore = route.params?.target;
+
     //data
     const [category] = useCategory();
+    const [like] = useLike();
 
     //state
     const [center, setCenter] = useState(defaultLocation);
@@ -24,16 +34,53 @@ export default function Search(){
     const [voucherChk, setVoucherChk] = useState(false);
     const [availChk, setAvailChk] = useState(false);
     const [cateObj, setCateObj] = useState(null);
+    const [searchFocus, setSearchFocus] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const [keyword, setKeyword] = useState('');
 
     //memo
     const searchGear = useMemo(() => {
+        Animated.timing(searchBarWidth, {
+            toValue: searchFocus? 90 : 100,
+            duration: 300,
+            useNativeDriver: false
+        }).start();            
+        
+        const searchSubmit = () => setKeyword(searchText);
+        const closeSearch = () => {
+            setSearchFocus(false); 
+            searchBarRef.current.blur(); 
+            setSearchText(null);
+            setKeyword(null);
+        };
+        const openSearch = () => setSearchFocus(true);
+
         return (
-            <StyledSearchBar>
-                <StyledSearchBarInput placeholder="매장, 지역 이름으로 검색하세요" placeholderTextColor={'#333'}/>
-                <StyledSearchBarIcon suppressHighlighting={true} name ="md-search-outline" onPress={() => console.log('test')}/>
+            <>
+            <StyledSearchBar style={{width: searchBarAnimation}}>
+                <StyledSearchBackIcon 
+                    name='caret-back' 
+                    color='#F33562' 
+                    size={40} 
+                    onPress={closeSearch} 
+                    suppressHighlighting={true}
+                />
+                <StyledSearchBarInput 
+                    ref={searchBarRef} 
+                    onFocus={openSearch} 
+                    placeholder="매장, 지역 이름으로 검색하세요" 
+                    placeholderTextColor={'#333'}
+                    onChangeText={(text) => setSearchText(text)}
+                    value={searchText}
+                    onSubmitEditing={searchSubmit}
+                    returnKeyType="done"
+                />
+                {searchText ? <Icon name="close-circle" color="#999" size={18} onPress={() => setSearchText(null)}/> : null}
+                <StyledSearchBarIcon suppressHighlighting={true} name ="md-search-outline" onPress={searchSubmit}/>
             </StyledSearchBar>
+            </>
         );
-    }, []);
+    }, [searchFocus, searchText]);
 
     const chkFilterGear = useMemo(() => {
         return (
@@ -62,11 +109,9 @@ export default function Search(){
 
     const mapGear = useMemo(() => {
         return (
-            <StyledBody>
-                <MapView markerData={markerData || []} onCenterChange={setCenter} listOpen={setStoreListOpen}/>
-            </StyledBody>
+            <MapView markerData={markerData || []} onCenterChange={setCenter} listOpen={setStoreListOpen} targetStore={targetStore}/>
         );
-    }, [markerData]);
+    }, [markerData, targetStore]);
 
     const categoryModalGear = useMemo(() => {
         if(!cateObj) return;
@@ -81,29 +126,35 @@ export default function Search(){
             />
         )
     }, [cateOpen, cateObj, cateSelect]);
-
     
     const storeListModalGear = useMemo(() => {
-        if(!(markerData?.length)) return;
+        if(!markerData) return;
         return (
-            <StoreListModal 
-                list={markerData} 
-                modalOpen={storeListOpen}
-                modalCloseEvent={() => setStoreListOpen(false)}            
-            />
+            <StyledListModal
+                isOpen={storeListOpen}
+                onClosed={() => {setStoreListOpen(false)}} //reset if not changed
+                backdropOpacity={0.4}
+                position="bottom"
+                swipeToClose={false}
+            >            
+                <StoreListView list={markerData} />
+            </StyledListModal>
         )
     }, [markerData, storeListOpen]);
-    
+
+    const searchViewGear = useMemo(() => {
+        return searchFocus ? <SearchView keyword={keyword}/> : null;
+    }, [searchFocus, keyword]);
 
     //effect  
     useLayoutEffect(() => { //filtering
+        if(!storeData) return null;
+
         const td = new Date().getDay() || 7;
         const now = Number(timeToNumber(new Date()));
 
-        const filteredData = storeData && storeData.length ? 
+        const filteredData = storeData.length ? 
             storeData.map((i) => {
-                const tags = i.store_amenities.split(',');
-
                 //category filter
                 if(cateSelect != '0' && i.store_ctg_idx != cateSelect) return undefined;
 
@@ -115,26 +166,14 @@ export default function Search(){
                         i.store_closed_days.split(',').includes(String(td))
                     ){
                         return undefined;
-                    }else tags.unshift('즉시가능');
+                    };
                 }
-
                 //voucher filter
                 if(voucherChk){
                     if(i.store_voucher_use_yn != 'y') return undefined;
-                    else tags.unshift('할인중');
                 };                
-
-                return {
-                    name : i.store_name, 
-                    img : i.store_main_simg, 
-                    addr : i.store_addr, 
-                    tag : tags, 
-                    reviewAvg : Number(i.store_review_avg), 
-                    reviewCnt : Number(i.store_review_cnt), 
-                    latitude : Number(i.store_addr_y), 
-                    longitude: Number(i.store_addr_x)
-                };
-            }).filter(e=>e) : null;
+                return i;
+            }).filter(e=>e) : [];
 
         setMarkerData(filteredData);
     }, [storeData, voucherChk, availChk, cateSelect]);
@@ -142,22 +181,41 @@ export default function Search(){
     useLayoutEffect(() => {
         try{
             if(!center) return null;
-            const range = rangeSet[center.zoom];
+
+            //range set
+            const southWestPoint = center.cover[0];
+            const northEastPoint = center.cover[2];
             const params = {
-                store_addr_x_ge:Number(center.longitude) - range[0],
-                store_addr_x_le:Number(center.longitude) + range[0],
-                store_addr_y_ge:Number(center.latitude) - range[1],
-                store_addr_y_le:Number(center.latitude) + range[1],                
-            }
+                store_addr_x_ge:southWestPoint.longitude,
+                store_addr_x_le:northEastPoint.longitude,
+                store_addr_y_ge:southWestPoint.latitude,
+                store_addr_y_le:northEastPoint.latitude,
+            };
+            
+            //call store list
             apiCall.get('/store', {params} ).then(( res ) => {
                 if(res.data.result == "000"){
-                    setStoreData(res.data.list);
+                    let storeList = res.data.list;
+                    //like filtering...
+                    if(like){
+                        storeList = res.data.list.map((obj) => {
+                            const filtered = like.filter((i) => i.mb_like_store_idx == obj.store_idx).length;
+                            return {
+                                ...obj,
+                                like: filtered ? true : false
+                            };   
+                        });
+                    }
+                    setStoreData(storeList);
+                }else if(res.data.result=='001'){
+                    setStoreData([]);
                 }
             });
         }catch(e){
+            console.log('this error');
             console.log(e);
         }
-    }, [center]);     
+    }, [center, like]);     
 
     useLayoutEffect(() => {
         if(!(category?.length)) return null;
@@ -177,7 +235,10 @@ export default function Search(){
                         {selectFilterGear}
                     </StyledFilterArea>
                 </StyledHeader>
-                {mapGear}
+                <StyledBody>
+                    {mapGear}
+                    {searchViewGear}
+                </StyledBody>
             </StyledConatainer>
             {categoryModalGear}
             {storeListModalGear}
@@ -194,10 +255,10 @@ const StyledConatainer = styled.View`
     flex:1;
 `;
 const StyledHeader = styled.View`
-    top:1%;
     margin:0 20px;
+    margin-top:7px;
 `;
-const StyledSearchBar = styled.View`
+const StyledSearchBar = styled(Animated.View)`
     margin:15px 0;
     height:40px;
     border-width:1px;
@@ -205,6 +266,7 @@ const StyledSearchBar = styled.View`
     border-radius:5px;
     flex-direction:row;
     align-items:center;
+    align-self:flex-end;
 `;
 const StyledSearchBarInput = styled.TextInput`
     height:80%;
@@ -217,8 +279,12 @@ const StyledSearchBarIcon = styled(Icon)`
     text-align:center;
     color:#333;
 `;
+const StyledSearchBackIcon = styled(Icon)`
+    position:absolute;
+    left:-50px;
+`;
 const StyledBody = styled.View`
-    margin:25px 0;
+    margin:20px 0;
 `;
 const StyledFilterArea = styled.ScrollView`
     overflow:visible;
@@ -235,4 +301,11 @@ const StyledFilterItemText = styled.Text`
     font-size:14px;
     font-weight:700;
     color:${(props) => props.selected ? '#F33562' : '#444'};
+`;
+const StyledListModal = styled(Modal)`
+    border-top-right-radius:25px;
+    border-top-left-radius:25px;
+    height:600px;
+    margin-top:20px;
+    overflow:hidden;
 `;

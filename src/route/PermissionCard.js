@@ -4,6 +4,7 @@ import { useState, useLayoutEffect } from 'react';
 import { permissionCheck } from '@/lib';
 import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
+import { rw } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function PermissionCard(){
@@ -61,5 +62,5 @@ const StyledConatainer = styled.View`
 const StyledHeaderText = styled.Text`
     font-weight:bold;
     color:#fff;
-    font-size:25px;
+    font-size:${rw*24}px;
 `;

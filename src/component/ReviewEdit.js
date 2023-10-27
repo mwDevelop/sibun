@@ -1,20 +1,76 @@
 //------------------------------ MODULE --------------------------------
-import { useLayoutEffect, useState, useMemo } from 'react';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useState, useMemo } from 'react';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import { numberToTime, uniquePush } from '@/lib';
-import {StarScore} from '@/component';
-import {reviewScoreOption, reviewTagOption} from '@/data/constants';
-import ImagePicker from 'react-native-image-crop-picker';
+import { StarScore, ImageUpload } from '@/component';
+import {reviewScoreOption, reviewTagOption, alertDefaultSetting} from '@/data/constants';
+import { picture_upload, x_circle } from '@/assets/img';
+import { Dimensions } from 'react-native';
+import AwesomeAlert from 'react-native-awesome-alerts';
+import { useMyReviewMutate } from '@/hooks';
+import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 //---------------------------- COMPONENT -------------------------------
-export default function ReviewEdit({type='add', reservationData=null, reviewData=null}){
+export default function ReviewEdit({reservationData=null, reviewData=null}){
+    //init
+    const windowWidth = Dimensions.get('window').width -30/*section margin*/;
+    const imageWidth = windowWidth/4 -2/*border*/ -3/*gap*/;
+    const textMin = 10;
+    const textMax = 300;
+    const reviewMutation = useMyReviewMutate();
+    const navigation = useNavigation();
+
     //state
-    const [score, setScore] = useState(reviewData?.test || 1);
+    const [score, setScore] = useState(reviewData?.test || 0);
     const [tags, setTags] = useState([]);
     const [text, setText] = useState('');
+    const [uploadOpen, setUploadOpen] = useState(false);
+    const [photos, setPhotos] = useState([]);
+    const [confirm, setConfirm] = useState(false);
+
+    //function
+    const badToast = (msg) => {
+        return Toast.show({
+            type: 'bad',
+            text1: msg || '문제가 발생했습니다\n\n관리자에게 문의 해 주세요!',
+            topOffset: 120,
+            visibilityTime: 2000
+        })
+    };
+
+    const saveChk = () => {
+        if(score < 1) return badToast(`매장 별점을 선택 해 주세요.`);
+        if(text.length < textMin) return badToast(`리뷰작성은 ${textMin}자 이상 등록 해 주세요.`);
+        return setConfirm(true);
+    }
+
+    const save = () => {
+        try{
+            const params = { 
+                review_reservation_idx: reservationData.reservation_idx,
+                review_tags: tags.join(),
+                review_content: text,
+                review_rating: score
+            };
+            photos.forEach((item, index) => params[`review_img${index+1}`] = item);
+    
+            reviewMutation.mutate({type:"add", params:params}, {onSuccess: async(res) => {
+                if(res.data.result == "000"){
+                    navigation.navigate('리뷰관리');
+                    console.log(res.data);
+                }else{
+                    setTimeout(() => badToast('리뷰 등록에 실패하였습니다. 관리자에게 문의 해 주세요.'), 500);
+                }
+            }});
+        }catch(e){
+            console.log(e);
+            setTimeout(() => badToast('리뷰 등록에 실패하였습니다. 관리자에게 문의 해 주세요.'), 500);
+        }
+        return;        
+    }
 
     //memo
     const infoGear = useMemo(() => {
@@ -42,7 +98,7 @@ export default function ReviewEdit({type='add', reservationData=null, reviewData
                 <StyledSectionTitle>매장은 만족하셨나요?</StyledSectionTitle>
                 <StyledScoreRow>
                     <StarScore score={score} size={25} scoreCatch={setScore} starGap='3%'/>
-                    <StyledScoreText>{reviewScoreOption[score]['title']}!</StyledScoreText>
+                    {score ? <StyledScoreText>{reviewScoreOption[score]['title']}!</StyledScoreText> : null}
                 </StyledScoreRow>
             </StyledSection>
         )
@@ -74,48 +130,67 @@ export default function ReviewEdit({type='add', reservationData=null, reviewData
         return (
             <StyledSection>
                 <StyledSectionTitle>리뷰를 작성해주세요.</StyledSectionTitle>
-                <StyledTextArea multiline={true} numberOfLines = {4} onChangeText={(t) => setText(t)} value={text} placeholder="매장을 이용하면서 느꼈던 점을 리뷰로 남겨주세요."/>
+                <StyledTextArea 
+                    maxLength={textMax}
+                    multiline={true} 
+                    onChangeText={(t) => setText(t)} 
+                    value={text} 
+                    placeholder={`매장을 이용하면서 느꼈던 점을 리뷰로 남겨주세요.\n(${textMin}자 이상)`}
+                />
+                <StyledTextCnt>{text.length} / {textMax}</StyledTextCnt>
             </StyledSection>
         )
     }, [text]);
 
     const photoGear = useMemo(() => {
+        const photoList = [...photos];
         return (
             <StyledSection style={{paddingTop:0}}>
-                <StyledSectionTitle>사진 업로드</StyledSectionTitle>
+                <StyledSectionTitle>사진 업로드({photoList.length}/3)</StyledSectionTitle>
+                <StyledPhotoRow>
+                    <StyledPhotoBox style={{width:imageWidth}}>
+                        <StyledPhotoUploadButton onPress={() => setUploadOpen(true)}>
+                            <FastImage source={picture_upload} resizeMode="contain" style={{width: imageWidth/3, height: imageWidth/3}}/>
+                        </StyledPhotoUploadButton>
+                    </StyledPhotoBox>
+                    {
+                        photoList.map((item, index) => (
+                            <StyledPhotoBox key={index} style={{width:imageWidth, marginLeft:6}}>
+                                <FastImage source={{uri:item}} resizeMode="cover" style={{width: imageWidth-2, height: imageWidth-2, backgroundColor:'#E9E9E9', borderRadius:5}}/>
+                                <StyledImageDelete 
+                                    onPress={() => {
+                                        photoList.splice(index,1);
+                                        setPhotos(photoList);
+                                    }}
+                                >
+                                    <FastImage source={x_circle} style={{width:15, height:15}}/>
+                                </StyledImageDelete>
+                            </StyledPhotoBox>
+                        ))
+                    }
+                </StyledPhotoRow>
             </StyledSection>
         )
-    }, []);
+    }, [photos]);
 
-    const submitGear = useMemo(() => {
-        return (
-            <StyledSubmit>
-                {
-                    type=='add' ? (
-                        <StyledSubmitButton>작성 완료</StyledSubmitButton>
-                    ) : (
-                        <>
-                        <StyledSubmitButton>취소</StyledSubmitButton>
-                        <StyledSubmitButton>수정 완료</StyledSubmitButton>
-                        </>
-                    )
-                }
-            </StyledSubmit>
-        );
-    }, [type]);
-
-    //effect
-    useLayoutEffect(() => {
-        console.log(reservationData);
-    });
-
-    useLayoutEffect(() => {
-        console.log(score);
-    }, [score]);
-
-    useLayoutEffect(() => {
-        console.log(tags);
-    }, [tags]);
+    const confirmGear = useMemo(() => (
+        <AwesomeAlert
+            {...alertDefaultSetting}
+            show={confirm}
+            title='시:분'
+            message={'리뷰를 등록하시면 수정하실 수 없습니다. \n 작성하신 리뷰를 등록하시겠습니까?'}
+            confirmText="등록하기"
+            cancelText="아니오"
+            onCancelPressed={() => {
+                setConfirm(false);
+            }}
+            onConfirmPressed={() => {
+                save();
+                setConfirm(false);
+            }}
+            onDismiss={() => setConfirm(false)}
+        />
+    ), [confirm]);
 
     //render
     return (
@@ -125,7 +200,18 @@ export default function ReviewEdit({type='add', reservationData=null, reviewData
             {tagGear}
             {textGear}
             {photoGear}
-            {submitGear}
+            <StyledSubmit>
+                <StyledSubmitButton onPress={saveChk}>작성 완료</StyledSubmitButton>
+            </StyledSubmit>
+            <ImageUpload 
+                open={uploadOpen} 
+                close={() => setUploadOpen(false)} 
+                dataHandler={setPhotos}
+                title="매장 리뷰와 관련된 사진을 올려주세요!" 
+                max={3}
+                size={300}
+            />
+            {confirmGear}
         </StyledConatainer>
     )
 }
@@ -137,7 +223,6 @@ const StyledConatainer = styled.View`
 `;
 const StyledSection = styled.View`
     margin:0 15px;
-    background:yellow;
     border-color:#E9E9E9;
     padding:20px 0;
 `;
@@ -214,6 +299,34 @@ const StyledTagText = styled.Text`
 const StyledTextArea = styled.TextInput`
     border-width:1px;
     border-color:#E9E9E9;
+    border-radius:5px;
     height:100px;
     padding: 10px;
+`;
+const StyledTextCnt = styled.Text`
+    position:absolute;
+    bottom:0;
+    right:0;
+    color:#555;
+    font-size:13px;
+`;
+const StyledPhotoRow = styled.View`
+    flex-direction:row;
+`;
+const StyledPhotoBox = styled.View`
+    border-color:#E9E9E9;
+    aspect-ratio:1;
+    border-width:1px;
+    border-radius:5px;
+`;
+const StyledPhotoUploadButton = styled.TouchableOpacity`
+    height:100%;
+    width:100%;
+    align-items:center;
+    justify-content:center;
+`;
+const StyledImageDelete = styled.TouchableOpacity`
+    position:absolute;
+    top:-5px;
+    right:-5px;
 `;

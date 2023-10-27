@@ -4,28 +4,25 @@ import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
 import { useReservation } from '@/hooks';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {defaultImage} from '@/data/constants';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { onerror } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ReviewAddible(){
     //init
     const navigation = useNavigation();
+    const isFocused = useIsFocused();
 
     //data
-    const [reservation, reservationUpdate] = useReservation(null, {'reservation_stt':'5', 'col':'reservation_date,reservation_time'});
+    const [reservation, reservationUpdate] = useReservation(null, {'reservation_stt':'5', 'reservation_review_yn':'n', 'col':'reservation_date,reservation_time'});
 
     //effcet
     useLayoutEffect(() => {
-        reservationUpdate();
-    }, []);
-
-    useLayoutEffect(() => {
-        //console.log(reservation);
-    }, [reservation]);
+        if(isFocused) reservationUpdate();
+    }, [isFocused]);
 
     //render
-    return (
+    return reservation ? (
         <StyledConatainer>
             {
                 reservation?.length ? reservation.map((d, i) => (
@@ -33,13 +30,13 @@ export default function ReviewAddible(){
                         <StyledItemHeader>
                             <StyledItemDate>{d.reservation_date.substr(2).replaceAll('-','.')}</StyledItemDate>
                             <StyledHeaderButton>
-                                <StyledHeaderButtonText>예약 상세보기</StyledHeaderButtonText>
+                                <StyledHeaderButtonText onPress={() => navigation.navigate('예약상세', {id:d.reservation_idx})}>예약 상세보기</StyledHeaderButtonText>
                                 <Icon name="chevron-forward-outline" size={14}/>
                             </StyledHeaderButton>
                         </StyledItemHeader>
                         <StyledItemContent>
                             <StyledItemImageArea>
-                                <StyledItemImage source={{uri:d.store_main_simg || defaultImage}} resizeMode="contain"/>
+                                <StyledItemImage source={{uri:d.store_main_simg}} defaultSource={onerror} resizeMode="contain"/>
                             </StyledItemImageArea>
                             <StyledItemInfo>
                                 <StyledItemName>{d.store_name}</StyledItemName>
@@ -50,10 +47,10 @@ export default function ReviewAddible(){
                             <StyledItemAddButton suppressHighlighting={true} onPress={() => navigation.navigate('리뷰작성' ,{reservationData: d})}>리뷰 작성하기</StyledItemAddButton>
                         </StyledItemFooter>
                     </StyledItem>
-                )) : null
+                )) : <StyledEmptyText>작성하실 리뷰 건이 존재하지 않습니다.</StyledEmptyText>
             }
         </StyledConatainer>
-    );
+    ) : null;
 }
 
 //------------------------------- STYLE --------------------------------
@@ -66,6 +63,10 @@ const StyledItem = styled.View`
     margin-top:13px;
     background:#fff;
     border-radius:5px;
+    shadow-color: black; 
+    shadow-offset: 5px;
+    shadow-opacity: 0.1;
+    elevation:1;
 `;
 const StyledItemHeader = styled.View`
     flex-direction:row;
@@ -133,4 +134,9 @@ const StyledItemAddButton = styled.Text`
     padding:5px;
     font-size:14px;
     font-weight:500;
+`;
+const StyledEmptyText = styled.Text`
+    margin-top:50px;
+    align-self:center;
+    color:#222;
 `;

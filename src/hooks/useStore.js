@@ -11,6 +11,7 @@ export default function useStore(id = null, params = null){
     if(id){
         queryKey.push('id');
         queryKey.push(id);
+        params = null;
     }else if(params){
         queryKey.push('params');
         queryKey.push(`%${JSON.stringify(params)}`);
@@ -20,7 +21,7 @@ export default function useStore(id = null, params = null){
     //query
     const storeData = useQuery(
         queryKey, 
-        () => apiCall.get( queryUrl, (id || !params) ? null : {params}).then(( res ) => {
+        () => apiCall.get( queryUrl, {params} ).then(( res ) => {
             if(res.data.result == "000") return id ? res.data.data : res.data.list;
             else {
                 //console.log(`-------${queryKey}--------`);

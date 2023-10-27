@@ -6,7 +6,7 @@ import { star_filled, star_half, star_empty } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
 //render
-export default React.memo(({score=0, size=14, showText=false, scoreCatch=() => {}, starGap='1.5%'}) => {
+export default React.memo(({score=0, size=14, showText=false, textColor='#F33562', textSize='14px', scoreCatch=() => {}, starGap='1.5%'}) => {
     //function
     const starTemplate = () => {
         const starList = [];
@@ -32,7 +32,7 @@ export default React.memo(({score=0, size=14, showText=false, scoreCatch=() => {
                 {starTemplate()}
                 {
                     showText ? 
-                    <StyledScoreText>{score}{!Number.isInteger(score) ? '.0':''}</StyledScoreText>
+                    <StyledScoreText color={textColor} size={textSize}>{score}{!Number.isInteger(score) ? '.0':''}</StyledScoreText>
                     : null
                 }                
             </StyledStarRow>
@@ -48,6 +48,7 @@ const StyledStarRow = styled.View`
     justify-content:space-between;
 `;
 const StyledStarUnitCover = styled.TouchableOpacity`
+    justify-content:center;
 `;
 const StyledStarUnit = styled(FastImage)`
     width:${(props) => props.size}px;
@@ -55,7 +56,8 @@ const StyledStarUnit = styled(FastImage)`
     margin-right:${(props) => props.endChk ? '0' : props.starGap};
 `;
 const StyledScoreText = styled.Text`
-    color:#F33562;
+    color:${props => props.color};
     font-weight:500;
     margin-left:5px;
+    font-size:${props => props.size};
 `;

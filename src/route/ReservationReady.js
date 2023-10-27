@@ -17,7 +17,7 @@ export default function ReservationReady(){
     //render
     return (
         <StyledConatainer>
-            <ReservationListView data={reservation || {}}/>
+            <ReservationListView data={reservation}/>
         </StyledConatainer>
     )
 }

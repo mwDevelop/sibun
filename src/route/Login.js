@@ -8,6 +8,9 @@ import MaIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import {login_kakao, login_apple, login_mobile} from '@/assets/img';
 import FastImage from 'react-native-fast-image';
+import {errorToast} from '@/data/constants';
+import { korean_logo } from '@/assets/img';
+import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Login({route}){
@@ -29,10 +32,9 @@ export default function Login({route}){
             </StyledFreePass>                
         )
         }
-        <StyledTitleTextArea>
-            <StyledTitleMain>SUN</StyledTitleMain>
-            <StyledTitleMain>TALK</StyledTitleMain>
-        </StyledTitleTextArea>
+        <StyledTitleArea>
+            <StyledTitleLogo source={korean_logo} resizeMode='contain'/>
+        </StyledTitleArea>
         </>
     ), []);
 
@@ -52,22 +54,22 @@ export default function Login({route}){
     const buttonGear  = useMemo(() => {
         const buttonList = [
             {
-                icon : <MaIcon name='chat' color="#351209" size={33}/>,
+                icon : <MaIcon name='chat' color="#351209" size={rw*33}/>,
                 background: '#FFEF61',
                 img: login_kakao,
-                event: () => AsyncStorage.clear()
+                event: () => Toast.show(errorToast)
             },
             {
-                icon : <MaIcon name='cellphone' size={40}/>,
+                icon : <MaIcon name='cellphone' size={rw*40}/>,
                 background: 'white',
                 img: login_mobile,
                 event: () => navigation.navigate("로그인 / 회원가입", {page: 0, finalDestination: afterLoginPage || 'Content'})
             },
             Platform.OS === "ios" ? {
-                icon : <MaIcon name='apple' color="white" size={33}/>,
+                icon : <MaIcon name='apple' color="white" size={rw*33}/>,
                 background: '#333',
                 img: login_apple,
-                event: () => AsyncStorage.clear()
+                event: () => Toast.show(errorToast)
             } : null,              
         ]
 
@@ -90,7 +92,7 @@ export default function Login({route}){
             Toast.show({
                 type: 'bad',
                 text1: route.params.expired,
-                topOffset: 120,
+                topOffset: rh*120,
                 visibilityTime: 1000
             })
         }
@@ -123,35 +125,34 @@ const StyledTitleSection = styled.View`
     align-items:center;
     justify-content:center;
 `;
-const StyledTitleTextArea = styled.View`
+const StyledTitleArea = styled.View`
     flex:0.2;
     align-items:center;
     top:5%;
 `;
-const StyledTitleMain = styled.Text`
-    font-size:45px;
-    font-weight:800;  
-    color:#F33562;
+const StyledTitleLogo = styled(FastImage)`
+    height:${rh*58}px;
+    width:${rw*300}px;
 `;
 const StyledContentSection = styled.View`
     flex:1;
     margin:5%;
 `;
 const StyledContentTitle = styled.View`
-    height:70px;
+    height:${rh*65}px;
     align-items:center;
     justify-content:center;
 `;
 const StyledContentTitleLine = styled.View`
     position:absolute;
     background:#E8E8E8;
-    height:1px;
+    height:${rh*1}px;
     width:100%;
 `;
 const StyledContentTitleText = styled.Text`
     background:white;
-    width:220px;
-    font-size:14px;
+    width:${rw*220}px;
+    font-size:${rw*13.5}px;
     font-weight:500;
     text-align:center;
     color:#444;
@@ -165,19 +166,19 @@ const StyledContentButton = styled.View`
 const StyledContentButtonItem = styled.TouchableOpacity`
 `;
 const StyledContentButtonImage = styled(FastImage)`
-    width:80px;
-    height:80px;
+    width:${rw*75}px;
+    height:${rw*75}px;
 `;
 const StyledFindAccountText = styled.Text`
     text-align:center;
-    margin:15px;
-    font-size:14px;
+    margin:${rw*15}px;
+    font-size:${rw*13.5}px;
     color:#7D7D7D;
 `;
 const StyledFreePass = styled.Text`
     position:absolute;
     top:5%;
     right:8%;
-    font-size:14px;
+    font-size:${rw*13.5}px;
     color:#ccc;
 `;

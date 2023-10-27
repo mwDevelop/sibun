@@ -3,8 +3,8 @@ import React from 'react';
 import { useState, useMemo } from 'react';
 import styled from 'styled-components/native';
 import FastImage from 'react-native-fast-image';
-import { defaultImage } from '@/data/constants';
 import { StarScore, ImageModal } from '@/component';
+import { profile_default } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
 //render
@@ -24,10 +24,10 @@ export default React.memo(({data=null, zIndex=-1}) => {
                     return (
                         <StyledSection key={index}>
                             <StyledSectionRow>
-                                <StyledProfileImage source={{uri:defaultImage}} />
+                                <StyledProfileImage source={{uri:item.mb_profile_img}} defaultSource={profile_default} />
                                 <StyledSectionCol>
                                     <StyledSectionColRow>
-                                        <StyledProfileText>앙칼진백조</StyledProfileText>
+                                        <StyledProfileText>{item.mb_nickname}</StyledProfileText>
                                         <StyledRegDate>
                                             {item.review_reg_dt.substr(2,2)}.
                                             {item.review_reg_dt.substr(5,2)}.
@@ -44,20 +44,24 @@ export default React.memo(({data=null, zIndex=-1}) => {
                                 <StyledSectionRow>
                                     {ImageData.map( 
                                         (src, idx) => (
-                                            <StyledReviewImagePress key={idx} activeOpacity={1} onPress={() => setModalData(ImageData)}>
-                                                <StyledReviewImage source={{uri:src}} resizeMode="contain"/>
+                                            <StyledReviewImagePress key={idx} activeOpacity={1} onPress={() => setModalData({data:ImageData, startIdx:idx})}>
+                                                <StyledReviewImage source={{uri:src}} resizeMode="cover"/>
                                             </StyledReviewImagePress>
                                         )
                                     )}
                                 </StyledSectionRow>                    
                             }
-                            <StyledSectionRow>
-                                {/* SAMPLE TAG DATA */}
-                                <StyledHashTagText>#친절해요</StyledHashTagText>
-                                <StyledHashTagText>#갓성비</StyledHashTagText>
-                                <StyledHashTagText>#깨끗해요</StyledHashTagText>
-                                <StyledHashTagText>#주차 편해요</StyledHashTagText>                        
-                            </StyledSectionRow>
+                            {
+                                item.review_tags ? (
+                                    <StyledSectionRow>
+                                        {
+                                            item.review_tags.split(',').map((text, index) => (
+                                                <StyledHashTagText key={index}>#{text}</StyledHashTagText>        
+                                            ))
+                                        }              
+                                    </StyledSectionRow>
+                                ) : null
+                            }
                             {   /* CONTENT AREA */
                                 !item.review_content ? null : (
                                     <StyledSectionRow>
@@ -77,7 +81,7 @@ export default React.memo(({data=null, zIndex=-1}) => {
     return (
         <>
             {listGear}
-            <ImageModal data={modalData} close={() => setModalData(null)}/>
+            <ImageModal data={modalData?.data} startIdx={modalData?.startIdx} close={() => setModalData(null)}/>
         </>
     )
 });
@@ -125,6 +129,7 @@ const StyledReviewImagePress = styled.TouchableOpacity`
     border-radius:5px;
     margin-right:5px;
     background:#eee;
+    overflow:hidden;
 `;
 const StyledReviewImage = styled(FastImage)`
     height:100%;

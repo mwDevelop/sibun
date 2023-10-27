@@ -1,5 +1,5 @@
 //------------------------------ MODULE --------------------------------
-import { useLayoutEffect, useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useLayoutEffect, useMemo, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { useStore, useUser} from '@/hooks';
 import { CheckBox, CouponSlide } from '@/component';
@@ -8,6 +8,8 @@ import { koreanDay, globalMsg } from '@/data/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { alertDefaultSetting } from '@/data/constants';
 import { useReservationMutate } from '@/hooks';
+import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Reservation({route}){
@@ -16,6 +18,7 @@ export default function Reservation({route}){
     const cellphoneRef = useRef(); 
     const timeTable = [2,3,4]; // 1 for 60min 
     const reservationMutation = useReservationMutate();
+    const navigation = useNavigation();
 
     //data
     const [store] = useStore(storeIdx);
@@ -33,7 +36,7 @@ export default function Reservation({route}){
     const [usingTimePicked, setUsingTimePicked] = useState(null);
     const [roomPicked, setRoomPicked] = useState(null);
     const [couponPicked, setCouponPicked] = useState(null);
-    const [dateStatus, setDateStatus] = useState(null);
+    const [bookStatus, setBookStatus] = useState(null);
     const [room, setRoom] = useState(null);
     const [coupon, setCoupon] = useState(null);
     const [terms, setTerms] = useState([
@@ -44,14 +47,23 @@ export default function Reservation({route}){
     const [cellphone, setCellphone] = useState(user?.mb_cellphone);
     const [cellphoneEdit, setCellphoneEdit] = useState(false);
     const [requestText, setRequestText] = useState('');
-    const [alert, setAlert] = useState('');
-    const [confirm, setConfirm] = useState('');
+    const [confirm, setConfirm] = useState(false);
+    const [confirmMsg, setConfirmMsg] = useState(null);
 
     //function
+    const badToast = (msg) => {
+        return Toast.show({
+            type: 'bad',
+            text1: msg || '문제가 발생했습니다\n\n관리자에게 문의 해 주세요!',
+            topOffset: 120,
+            visibilityTime: 2000
+        })
+    };
+
     const onEditClick = (letters) => {
         if(letters.length < 10){
             cellphoneRef.current.focus();
-            return setAlert(globalMsg['invalidPhone']);
+            return badToast(globalMsg['invalidPhone']);
         }
         setCellphoneEdit(!cellphoneEdit);
     }
@@ -63,15 +75,50 @@ export default function Reservation({route}){
             });
     }
 
-    const callDateStatus = useCallback(() => {
-        const params = { reservation_date:timeToText(datePicked, 'y-mm-dd')};
+    const callBookStatus = (target) => {
+        //time range option
+        const start = target-3;
+        const end = target+3;
+        let timeInParam = `${start}`;
+        for(let i=start+1; i <= end; i++) timeInParam += `,${i}`;
+        
+        //get current reservation in the range
+        const params = { 
+            reservation_date:timeToText(datePicked, 'y-mm-dd'),
+            reservation_time_in:timeInParam,
+            reservation_stt_in:'1,2,5' // ready, confirm, enter
+        };
         apiCall.get(`/store/${storeIdx}/reservation`, {params})
             .then((res) => {
-                if(res.data.result == "000") setDateStatus(res?.data?.list);
+                const bookMemo = {};
+                if(res.data.result == "000"){
+                    if(res?.data?.list){
+                        //make object of rooms(set data) booked by time(key)
+                        const copiedList = JSON.parse(JSON.stringify(res.data.list));
+                        copiedList.sort((a,b) => Number(a.reservation_time)-Number(b.reservation_time));
+                        copiedList.forEach((obj) => {
+                            const loopStart = Number(obj.reservation_time);
+                            const loopEnd = loopStart + Number(obj.reservation_period); //not included
+                            for(let i=loopStart; i<loopEnd; i++){
+                                if(i < target) continue; //only for meaningful time
+                                if(!(i in bookMemo)) bookMemo[i] = new Set();
+                                bookMemo[i].add(obj.reservation_room_idx);
+                            }
+                        });
+                    }
+                }
+                //fill empty date & setState
+                for(let i=target; i<end; i++){
+                    if(!(i in bookMemo)) bookMemo[i] = new Set();
+                }
+                setBookStatus(bookMemo);                 
+            }).catch((e) => {
+                console.log(e);
             });
-    }, [datePicked]);
+    };
 
-    const callCoupon = useCallback(() => {
+    const callCoupon = async() => {
+        //call coupon list 
         const params = {};
         if(datePicked) {
             const dayId = datePicked.getDay() == 0 ? "7" : String(datePicked.getDay());
@@ -79,22 +126,38 @@ export default function Reservation({route}){
             params.store_voucher_available_days = dayId;
         }             
         if(timePicked) params.store_voucher_time = String(timePicked);
-        apiCall.get(`/store/${storeIdx}/voucher`, {params})
-            .then((res) => {
-                if(res.data.result == "000") setCoupon(res?.data?.list);
-                else{setCoupon(null)}
-            });
-    }, [datePicked, timePicked]);
+        const vRes = await apiCall.get(`/store/${storeIdx}/voucher`, {params});
+        if(vRes.data.result == "000"){
+            let couponList = vRes.data.list?.length ? vRes.data.list : null;
+            if(couponList){
+                //call reservations discounted by coupons in the coupon list
+                const params = { 
+                    reservation_date : timeToText(datePicked, 'y-mm-dd'),
+                    reservation_voucher_idx_in : vRes.data.list.map((item) => item.store_voucher_idx).join(),
+                    reservation_stt_in:'1,2,4,5' // ready, confirm, noshow, enter
+                };
+                const rRes = await apiCall.get(`/store/${storeIdx}/reservation`, {params});                    
+                if(rRes.data.result == "000" && rRes.data.list?.length){
+                    //filtering fully used daily coupon
+                    couponList = couponList.filter((couponData) => 
+                        rRes.data.list.filter((bookData) => 
+                            bookData.reservation_voucher_idx == couponData.store_voucher_idx
+                        ).length < couponData.store_voucher_daily_total_cnt);
+                }
+            }
+            setCoupon(couponList);
+        }else{setCoupon(null)}
+    };
 
     const submitChk = () => {
         //data chk...
-        if(!datePicked) return setAlert(globalMsg['isNotSelectedDate']);
-        if(!timePicked) return setAlert(globalMsg['isNotSelectedTime']);
-        if(!usingTimePicked) return setAlert(globalMsg['isNotSelectedUsing']);
-        if(!roomPicked) return setAlert(globalMsg['isNotSelectedRoom']);
-        if(!cellphone || cellphone.length<11) return setAlert(globalMsg['invalidPhone']);
+        if(!datePicked) return badToast(globalMsg['isNotSelectedDate']);
+        if(!timePicked) return badToast(globalMsg['isNotSelectedTime']);
+        if(!usingTimePicked) return badToast(globalMsg['isNotSelectedUsing']);
+        if(!roomPicked) return badToast(globalMsg['isNotSelectedRoom']);
+        if(!cellphone || cellphone.length<11) return badToast(globalMsg['invalidPhone']);
         terms.forEach((d) => {
-            if(d.required && !d.selected) return setAlert(globalMsg['selectRequired']);
+            if(d.required && !d.selected) return badToast(globalMsg['selectRequired']);
         })
         
         //coupon chk...
@@ -104,7 +167,8 @@ export default function Reservation({route}){
         }
 
         //set confirm open
-        return setConfirm(`날짜 :    ${timeToText(datePicked, 'y-mm-dd')}\n시간 :    ${numberToTime(timePicked)}~${numberToTime(timePicked+usingTimePicked)}\n쿠폰 :    ${couponText}`);
+        setConfirmMsg(`날짜 :    ${timeToText(datePicked, 'y-mm-dd')}\n시간 :    ${numberToTime(timePicked)}~${numberToTime(timePicked+usingTimePicked)}\n쿠폰 :    ${couponText}`);
+        setConfirm(true);
     };
 
     const save = () => {
@@ -121,7 +185,9 @@ export default function Reservation({route}){
 
         reservationMutation.mutate({type:"add", params:params}, {onSuccess: async(res) => {
             if(res.data.result == "000"){
+                navigation.replace('예약상세', {id:res.data.data.lastInsertId});
             }else{
+                badToast();
             }
         }});        
     };
@@ -226,9 +292,19 @@ export default function Reservation({route}){
     }, [coupon, couponPicked]);
 
     const usingTimeGear = useMemo(() => {
+        //check reserved rooms
+        let ableMax = 4;
+        if(bookStatus && room) Object.entries(bookStatus).some(([key, item], index) => { //version chk for build(ordered by key from ver ES11)
+            if(item.size >= room.length){
+                ableMax = index;
+                return true;
+            }
+        });
+        //check close time
         const closeTime = store.store_close_time;
         const leftTime = closeTime-timePicked;
 
+        //render
         return (
             <StyledSubsection>
                 <StyledSubsectionTitle>이용시간</StyledSubsectionTitle>
@@ -238,10 +314,10 @@ export default function Reservation({route}){
                         {
                             timeTable.map((v, i) => {
                                 const pickChk = usingTimePicked == v; 
-                                const ableChk = timePicked && leftTime >= v;
+                                const ableChk = timePicked && leftTime >= v && v <= ableMax;
                                 const status = pickChk ? 'picked' : (ableChk ? 'able' : 'unable');
                                 return(
-                                    <StyledSubsectionBlockItem 
+                                    <StyledSubsectionBlockItem
                                         style={{width:'20%'}}
                                         key={i} 
                                         front={i==0}
@@ -261,9 +337,18 @@ export default function Reservation({route}){
                 </StyledSubsectionContent>                    
             </StyledSubsection>            
         )
-    }, [store, timePicked, usingTimePicked]);
+    }, [store, timePicked, usingTimePicked, bookStatus, room]);
     
     const roomGear = useMemo(() => {
+        //check reserved room
+        let unableRoomSet = new Set();
+        if(bookStatus && usingTimePicked){
+            Object.entries(bookStatus).some(([key, item], index) => {
+                unableRoomSet = new Set([...unableRoomSet, ...item]);
+                if(index+1 >= usingTimePicked) return true;
+            });
+        }
+
         return !room ? null : (
             <StyledSubsection>
                 <StyledSubsectionTitle>방선택</StyledSubsectionTitle>
@@ -273,7 +358,7 @@ export default function Reservation({route}){
                     {
                         room.map((v, i) => {
                             const pickChk = roomPicked == v.store_room_idx; 
-                            const ableChk = usingTimePicked;
+                            const ableChk = usingTimePicked && !unableRoomSet.has(String(v.store_room_idx));
                             const status = pickChk ? 'picked' : (ableChk ? 'able' : 'unable');
                             return (
                                 <StyledSubsectionBlockItem 
@@ -299,7 +384,7 @@ export default function Reservation({route}){
                 </StyledSubsectionContent>                    
             </StyledSubsection>            
         );
-    }, [usingTimePicked, roomPicked, room]);
+    }, [usingTimePicked, roomPicked, room, bookStatus]);
 
     const guestGear = useMemo(() => {
         return(
@@ -357,38 +442,23 @@ export default function Reservation({route}){
         return <StyledSubmit suppressHighlighting={true} active={activeChk} onPress={activeChk ? submitChk : null}>예약하기</StyledSubmit>;
     }, [roomPicked, terms]);
 
-    const alertGear = useMemo(() => (
-        <AwesomeAlert
-            {...alertDefaultSetting}
-            showCancelButton={false}
-            show={alert ? true : false}
-            title={alert}
-            confirmText="확인"
-            onCancelPressed={() => {
-                setAlert('');
-            }}
-            onConfirmPressed={() => setAlert('')}
-            onDismiss={() => setAlert('')}
-        />
-    ), [alert]);
-
     const confirmGear = useMemo(() => (
         <AwesomeAlert
             {...alertDefaultSetting}
-            show={confirm ? true : false}
+            show={confirm}
             title='해당 내용으로 예약하시겠습니까?'
-            message={confirm}
+            message={confirmMsg}
             confirmText="예약하기"
             onCancelPressed={() => {
-                setConfirm('');
+                setConfirm(false);
             }}
             onConfirmPressed={() => {
-                setConfirm('');
+                setConfirm(false);
                 save();
             }}
-            onDismiss={() => setConfirm('')}
+            onDismiss={() => setConfirm(false)}
         />
-    ), [confirm]);    
+    ), [confirm, confirmMsg]);    
 
     //effect
     useLayoutEffect(() => {
@@ -396,36 +466,7 @@ export default function Reservation({route}){
     }, []);
 
     useLayoutEffect(() => {
-        console.log("------- STORE STATUS --------");
-        console.log(store);
-        console.log("----------------------------");
-    }, [store]);    
-
-    useLayoutEffect(() => {
-        if(!dateStatus) return;
-        console.log("------- DATE STATUS --------");
-        console.log(dateStatus);
-        console.log("----------------------------");
-    }, [dateStatus]);
-
-    useLayoutEffect(() => {
-        if(!coupon) return;
-        console.log("------- COUPON STATUS --------");
-        console.log(coupon);
-        console.log("----------------------------");
-    }, [coupon]);
-
-    useLayoutEffect(() => {
-        if(!room) return;
-        console.log("------- ROOM STATUS --------");
-        console.log(room);
-        console.log("----------------------------");
-    }, [room]);    
-
-    useLayoutEffect(() => {
         if(!datePicked) return;
-        //update
-        callDateStatus();
         //refresh
         setTimePicked(null);
         setCoupon(null);
@@ -436,6 +477,7 @@ export default function Reservation({route}){
         if(!timePicked) return;
         //update
         callCoupon();
+        callBookStatus(timePicked);
         //refresh
         setCouponPicked(null);
         setUsingTimePicked(null);
@@ -467,7 +509,6 @@ export default function Reservation({route}){
             {termsGear}
         </StyledConatainer>
         {submitGear}
-        {alertGear}
         {confirmGear}
         </>
     )

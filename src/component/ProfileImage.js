@@ -2,36 +2,27 @@
 import styled from 'styled-components/native';
 import FastImage from 'react-native-fast-image';
 import { photo_edit } from '@/assets/img';
-import { Platform } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
-import { permissionCheck } from '@/lib';
 import React from 'react';
 import { profile_default } from '@/assets/img';
+import { ImageUpload } from '@/component';
+import { useState } from 'react';
 
 //---------------------------- COMPONENT -------------------------------
 export default React.memo(({src=profile_default, changeHandler=()=>{}, customStyle={}}) => {
+    //state
+    const [uploadOpen, setUploadOpen] = useState(false);
+
     //function
-    const imageUpload = async() => {
-        const chkResult = await permissionCheck(Platform.OS, 'photo');
-        if(chkResult != "granted" && chkResult != "limited") return;
-        ImagePicker.openPicker({
-            width: 70,
-            height: 70,
-            cropping: true,
-            includeBase64: true,
-            writeTempFile: false
-        }).then(image => {
-            changeHandler(`data:image/${image.mime};base64,${image.data}`);
-        });
-    }
+    const imageHandler = (arr) => changeHandler(arr[0]);
 
     //render
     return (
         <StyledImageBox style={customStyle}>
-            <StyledProfileImg source={src ? {uri:src} : profile_default}/>
-            <StyledProfileEditButton onPress={imageUpload}>
+            <StyledProfileImg source={{uri:src}} defaultSource={profile_default}/>
+            <StyledProfileEditButton onPress={() => setUploadOpen(true)}>
                 <StyledProfileEditButtonImage source={photo_edit}/>
             </StyledProfileEditButton>        
+            <ImageUpload size={200} open={uploadOpen} close={() => setUploadOpen(false)} dataHandler = {imageHandler} title="프로필 사진을 업로드 해 주세요!"/>
         </StyledImageBox>
     );
 });

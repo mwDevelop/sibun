@@ -8,6 +8,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { 
+    Start,
     Intro, 
     Login,
     Join,
@@ -30,6 +31,9 @@ import {
     ReviewAddible,
     ReviewMyList,
     ReviewAdd,
+    ReviewDesc,
+    RecentList,
+    LikeList,
     ModalGroup,
     NetworkError 
 } from '@/route';
@@ -41,6 +45,7 @@ import { useRecoilState } from "recoil";
 import { home_gray, home_color, location_gray, location_color, document_gray, document_color, person_gray, person_color } from '@/assets/img';
 import { useStorage } from '@/hooks';
 import NetInfo from "@react-native-community/netinfo";
+import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- NAVIGATORS -------------------------------
 const Drawer = createDrawerNavigator();
@@ -59,8 +64,8 @@ const ProfileEditSaveButton = () => {
         <Text 
             onPress={() => saveFlag == 'active' ? setSaveFlag('execute') : null}
             style={{
-                right:10,
-                fontSize:15,
+                right:rw*9,
+                fontSize:rw*14,
                 color:saveFlag == 'active' ? '#F33562' : '#BABABA'
             }}
         >
@@ -78,11 +83,11 @@ const ContentTab = () => {
     return (
         <Tab.Navigator 
             screenOptions={(r)=>({
-                tabBarIcon: ({focused}) => <Image source={r.route.params.icon[focused ? 1 : 0]} style={{height:28, width:24}}/>,
+                tabBarIcon: ({focused}) => <Image source={r.route.params.icon[focused ? 1 : 0]} style={{height:rw*32, width:rw*32}} resizeMode='contain'/>,
                 headerShown: false, 
-                tabBarStyle: { height: 70, paddingBottom: 20 },
+                tabBarStyle: { height: rh*65, paddingBottom: rh*10 },
                 headerTitleStyle: {
-                    fontSize:18,
+                    fontSize:rw*18,
                     fontWeight:600
                 },
                 tabBarShowLabel: false
@@ -105,13 +110,13 @@ const ReservationTab = () => {
                 backgroundColor:'#fff',
             }}
             screenOptions={{   
-                tabBarStyle:{paddingTop:15},
-                tabBarItemStyle: { width: 100 },
+                tabBarStyle:{paddingTop:rh*14},
+                tabBarItemStyle: { width: rw*95 },
                 tabBarPressColor: 'transparent',
                 tabBarActiveTintColor: '#222',
                 tabBarInactiveTintColor: '#7D7D7D',
                 tabBarLabelStyle: {
-                    fontSize: 16,
+                    fontSize: rw*15,
                     fontWeight: 'bold',
                 },    
                 tabBarIndicatorStyle: { backgroundColor: '#222' },                  
@@ -130,12 +135,12 @@ const ReviewTab = () => {
                 backgroundColor:'#fff',
             }}
             screenOptions={{   
-                tabBarStyle:{paddingTop:15, marginRight:20, marginLeft:20},
+                tabBarStyle:{paddingTop:rh*14, marginRight:rw*19, marginLeft:rw*19},
                 tabBarPressColor: 'transparent',
                 tabBarActiveTintColor: '#222',
                 tabBarInactiveTintColor: '#7D7D7D',
                 tabBarLabelStyle: {
-                    fontSize: 16,
+                    fontSize: rw*15,
                     fontWeight: 'bold',
                 },    
                 tabBarIndicatorStyle: { backgroundColor: '#222' },
@@ -174,7 +179,7 @@ const RootStack = () => {
         });
     }
 
-    const backButton = () => <Icon name="chevron-back-outline" size={35} style={{left:10}}/>;
+    const backButton = () => <Icon name="chevron-back-outline" size={rw*35} style={{left:rw*7}} />;
 
     //effect
     useLayoutEffect(() => {
@@ -187,11 +192,12 @@ const RootStack = () => {
     //render
     return firstLaunchChk == 'init' || access == 'init' ? null : (
         <Stack.Navigator
-            initialRouteName ={firstLaunchChk == 'true' ? 'Intro' : (access ? 'Content' : 'Login') } 
+            initialRouteName ={firstLaunchChk == 'true' ? 'Start' : (access ? 'Content' : 'Login') } 
+            //initialRouteName ='Start' 
             screenOptions={(r)=>({
                 headerShown: false, 
                 headerTitleStyle: {
-                    fontSize:18,
+                    fontSize:rw*17,
                     fontWeight:600
                 },
                 headerBackTitleVisible: false,
@@ -199,6 +205,7 @@ const RootStack = () => {
             })}        
         >
             {/********************* INTRO & PERMISSION **********************/}                
+            <Stack.Screen name="Start" component={Start} />
             <Stack.Screen name="Intro" component={Intro} />
             <Stack.Screen name="PermissionCard" component={PermissionCard} />
             {/*************************** LOGIN ******************************/}
@@ -219,9 +226,12 @@ const RootStack = () => {
             <Stack.Screen name="Setting" component={Setting}/>
             <Stack.Screen name="프로필 수정" component={ProfileEdit} options={{headerShown:true, headerRight:() => (<ProfileEditSaveButton/>)}}/>
             <Stack.Screen name="회원탈퇴" component={Leave} options={{headerShown:true}}/>
-            <Stack.Screen name="예약내역" component={ReservationTab} options={{headerShown:true,headerShadowVisible: false}}/>
-            <Stack.Screen name="리뷰관리" component={ReviewTab} options={{headerShown:true,headerShadowVisible: false}}/>
+            <Stack.Screen name="예약내역" component={ReservationTab} options={{headerShown:true, headerShadowVisible: false}}/>
+            <Stack.Screen name="리뷰관리" component={ReviewTab} options={{headerShown:true, headerShadowVisible: false}}/>
             <Stack.Screen name="리뷰작성" component={ReviewAdd} options={{headerShown:true}}/>
+            <Stack.Screen name="내 리뷰 상세보기" component={ReviewDesc} options={{headerShown:true}}/>
+            <Stack.Screen name="최근 본 매장" component={RecentList} options={{headerShown:true}}/>
+            <Stack.Screen name="찜한 매장" component={LikeList} options={{headerShown:true}}/>
             {/**************************** MODAL *****************************/}
             <Stack.Screen
                 name="ModalGroup"

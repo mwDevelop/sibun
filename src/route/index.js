@@ -1,4 +1,5 @@
 /*-----------------------------------------------------------*/
+export { default as Start} from "./Start";
 export { default as Intro} from "./Intro";
 /*-----------------------------------------------------------*/
 export { default as Login} from "./Login";
@@ -19,6 +20,9 @@ export { default as ReservationDone } from "./ReservationDone";
 export { default as ReviewAddible } from "./ReviewAddible";
 export { default as ReviewMyList } from "./ReviewMyList";
 export { default as ReviewAdd } from "./ReviewAdd";
+export { default as ReviewDesc } from "./ReviewDesc";
+export { default as RecentList } from "./RecentList";
+export { default as LikeList } from "./LikeList";
 /*-----------------------------------------------------------*/
 export { default as Search} from "./Search";
 export { default as Reservation } from "./Reservation";

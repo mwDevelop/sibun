@@ -1,6 +1,6 @@
 //------------------------------ MODULE --------------------------------
 import { useState, useLayoutEffect } from 'react';
-import { color_loading } from '@/assets/animation';
+import { color_loading, hamster_loading } from '@/assets/animation';
 import styled from 'styled-components/native';
 import LottieView from 'lottie-react-native';
 
@@ -12,7 +12,6 @@ export default function CustomInnerLoading({
         width="200px", 
         transparent="1",
         delay=2000
-
     }){
     //state
     const [visible, setVisible] = useState(true);
@@ -28,7 +27,7 @@ export default function CustomInnerLoading({
     return (       
         <StyledConatainer v={visible} p={paddingTop} t={transparent}>
             <StyledLottie 
-                source={lottie || color_loading}
+                source={lottie || hamster_loading}
                 autoPlay
                 loop            
                 h={height}
