@@ -16,7 +16,11 @@
     "ios:dev:d": "react-native run-ios --scheme Develop --configuration Debug --simulator='iPhone 12'",
     "ios:dev:r": "react-native run-ios --scheme Develop --configuration Release --device 'TEST iPhone'",
     "ios:prd:d": "react-native run-ios --scheme Product --configuration Debug --simulator='iPhone 12'",
-    "ios:prd:r": "react-native run-ios --scheme Product --configuration Release --device 'TEST iPhone'"
+    "ios:prd:r": "react-native run-ios --scheme Product --configuration Release --device 'TEST iPhone'",
+    
+    "make-apk:prd:r": "cd android && ./gradlew app:assembleProductRelease && cd ..",  
+    
+    "make-aab:prd:r": "cd android && ./gradlew bundleProductRelease && cd .."
   },
   "dependencies": {
     "@actbase/react-daum-postcode": "^1.0.4",

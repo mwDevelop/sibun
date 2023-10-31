@@ -4,7 +4,6 @@ import { useLayoutEffect } from 'react';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { AddressView } from '@/component';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ModalGroup(){
@@ -38,16 +37,16 @@ const StyledWindow = styled.TouchableOpacity`
 `;
 const StyledWindowCloser = styled.View`
     flex:0.008;
-    width:${rw*50}px;
+    width:50px;
     background:#fff;
     align-self:center;
-    bottom:${rh*10}px;
-    border-radius:${rw*50}px;
+    bottom:10px;
+    border-radius:50px;
 `;
 const StyledConatainer = styled.TouchableOpacity`
     flex:0.85;
     background:#fff;
-    border-top-right-radius:${rw*40}px;
-    border-top-left-radius:${rw*40}px;
+    border-top-right-radius:40px;
+    border-top-left-radius:40px;
     overflow:hidden;
 `;

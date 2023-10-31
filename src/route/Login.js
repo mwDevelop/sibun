@@ -10,7 +10,6 @@ import {login_kakao, login_apple, login_mobile} from '@/assets/img';
 import FastImage from 'react-native-fast-image';
 import {errorToast} from '@/data/constants';
 import { korean_logo } from '@/assets/img';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Login({route}){
@@ -54,19 +53,19 @@ export default function Login({route}){
     const buttonGear  = useMemo(() => {
         const buttonList = [
             {
-                icon : <MaIcon name='chat' color="#351209" size={rw*33}/>,
+                icon : <MaIcon name='chat' color="#351209" size={33}/>,
                 background: '#FFEF61',
                 img: login_kakao,
                 event: () => Toast.show(errorToast)
             },
             {
-                icon : <MaIcon name='cellphone' size={rw*40}/>,
+                icon : <MaIcon name='cellphone' size={40}/>,
                 background: 'white',
                 img: login_mobile,
                 event: () => navigation.navigate("로그인 / 회원가입", {page: 0, finalDestination: afterLoginPage || 'Content'})
             },
             Platform.OS === "ios" ? {
-                icon : <MaIcon name='apple' color="white" size={rw*33}/>,
+                icon : <MaIcon name='apple' color="white" size={33}/>,
                 background: '#333',
                 img: login_apple,
                 event: () => Toast.show(errorToast)
@@ -92,7 +91,7 @@ export default function Login({route}){
             Toast.show({
                 type: 'bad',
                 text1: route.params.expired,
-                topOffset: rh*120,
+                topOffset: 120,
                 visibilityTime: 1000
             })
         }
@@ -131,28 +130,28 @@ const StyledTitleArea = styled.View`
     top:5%;
 `;
 const StyledTitleLogo = styled(FastImage)`
-    height:${rh*58}px;
-    width:${rw*300}px;
+    height:60px;
+    width:300px;
 `;
 const StyledContentSection = styled.View`
     flex:1;
     margin:5%;
 `;
 const StyledContentTitle = styled.View`
-    height:${rh*65}px;
+    height:70px;
     align-items:center;
     justify-content:center;
 `;
 const StyledContentTitleLine = styled.View`
     position:absolute;
     background:#E8E8E8;
-    height:${rh*1}px;
+    height:1px;
     width:100%;
 `;
 const StyledContentTitleText = styled.Text`
     background:white;
-    width:${rw*220}px;
-    font-size:${rw*13.5}px;
+    width:220px;
+    font-size:14px;
     font-weight:500;
     text-align:center;
     color:#444;
@@ -166,19 +165,19 @@ const StyledContentButton = styled.View`
 const StyledContentButtonItem = styled.TouchableOpacity`
 `;
 const StyledContentButtonImage = styled(FastImage)`
-    width:${rw*75}px;
-    height:${rw*75}px;
+    width:80px;
+    height:80px;
 `;
 const StyledFindAccountText = styled.Text`
     text-align:center;
-    margin:${rw*15}px;
-    font-size:${rw*13.5}px;
+    margin:15px;
+    font-size:14px;
     color:#7D7D7D;
 `;
 const StyledFreePass = styled.Text`
     position:absolute;
     top:5%;
     right:8%;
-    font-size:${rw*13.5}px;
+    font-size:14px;
     color:#ccc;
 `;

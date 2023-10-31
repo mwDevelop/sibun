@@ -54,6 +54,7 @@ export { default as intro_coupon } from "./intro_coupon.png";
 export { default as intro_schedule } from "./intro_schedule.png";
 
 export { default as onerror } from "./onerror.png";
+export { default as under_balloon } from "./under_balloon.png";
 
 
 

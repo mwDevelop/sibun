@@ -11,7 +11,6 @@ import { apiCall, mobileMask, numberFilter, specialCharFilter, login, timeToText
 import uuid from 'react-native-uuid';
 import { useUserMutate } from '@/hooks';
 import Modal from 'react-native-modalbox';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Join({route}){
@@ -266,10 +265,10 @@ export default function Join({route}){
                         inputContainerStyle={{
                             backgroundColor: '#fff',
                             borderRadius: 5,
-                            height:rh*45,
+                            height:50,
                             borderColor:'#eee',
-                            borderWidth:rw*1,
-                            width:rw*170,
+                            borderWidth:1,
+                            width:170,
                             alignItems:"center",
                         }}
                     />    
@@ -360,7 +359,7 @@ export default function Join({route}){
 const StyledConatainer = styled.View`
     flex:1;
     background:white;
-    padding:${rh*10}px ${rw*20}px;
+    padding:10px 20px;
 `;
 const StyledHeader = styled.View`
     flex:0.15;
@@ -371,7 +370,7 @@ const StyledHeader = styled.View`
 const StyledHeaderTitle = styled.View`
 `;
 const StyledHeaderTitleText = styled.Text`
-    font-size:${rw*20}px;
+    font-size:20px;
     font-weight:600;
 `;
 const StyledHeaderPage = styled.View`
@@ -379,12 +378,12 @@ const StyledHeaderPage = styled.View`
 `;
 const StyledHeaderPageFront = styled.Text`
     color:#F33562;
-    font-size:${rw*16}px;
+    font-size:16px;
     font-weight:500;
 `;
 const StyledHeaderPageRear = styled.Text`
     color:#7D7D7D;
-    font-size:${rw*16}px;
+    font-size:16px;
     font-weight:500;
 `;
 const StyledBody = styled.View`
@@ -399,30 +398,30 @@ const StyledFooterNext = styled.TouchableOpacity`
     align-items:center;
 `;
 const StyledFooterNextText = styled.Text`
-    font-size:${rw*16}px;
+    font-size:16px;
     font-weight:500;
 `;
 const StyledFooterNextIcon = styled(Icon)`
-    font-size:${rw*24}px;
-    margin-left:${rw*10}px;
+    font-size:24px;
+    margin-left:10px;
 `;
 const StyledSection = styled.View`
 `;
 const StyledInput = styled.TextInput`
     width:100%;
-    height:${rh*45}px;
+    height:50px;
     background:#ECECEC;
     border-radius:5px;
-    margin:${rw*5}px 0;
-    padding:0 ${rw*20}px;
+    margin:5px 0;
+    padding:0 20px;
 `;
 const StyledDateText = styled.Text`
     width:100%;
-    line-height:${rh*43}px;
+    line-height:48px;
     background:#ECECEC;
     border-radius:5px;
-    margin:${rw*5}px 0;
-    padding:0 ${rw*20}px;
+    margin:5px 0;
+    padding:0 20px;
     overflow:hidden;
 `;
 const StyledEmailArea = styled.View`
@@ -431,36 +430,35 @@ const StyledEmailArea = styled.View`
 `;
 const StyledEmailMiddleText = styled.Text`
     text-align:center;
-    font-size:${rw*20}px;
+    font-size:20px;
     color:#555;
-    line-height:${rh*50}px;
+    line-height:50px;
     flex:0.2;
-    margin:0 ${rw*3}px;
 `;
 const StyledInnerButton = styled.TouchableOpacity`
     background: #fff;
     position:absolute;
     top:51%;
     right:5%;
-    border-radius:${rw*50}px;
-    padding:${rh*10}px;
+    border-radius:50px;
+    padding:10px;
     border-width:1px;
     border-color:#D9D9D9;
 `;
 const StyledInnerButtonText = styled.Text`
     color:#444;
-    font-size:${rw*12}px;
+    font-size:12px;
 `;
 const StyledInputMessage = styled.Text`
     color:${(props) => props.passed ? '#2D5198' : 'red'};
-    font-size:${rw*10}px;
+    font-size:10px;
     font-weight:600;
-    margin: ${rw*2}px 0;
+    margin: 2px 0;
 `;
 const StyledButtonArea = styled.View`
     flex-direction:row;
     justify-content:space-between;
-    margin: ${rh*5}px 0;
+    margin: 5px 0;
 `;
 const StyledButtonText = styled.Text`
     width:48%;
@@ -469,33 +467,32 @@ const StyledButtonText = styled.Text`
     overflow:hidden;
     background:${(props) => props.selected ? "#F33562" : "#fff"};
     color:${(props) => props.selected ? "#fff" : "#222"};;
-    border-width:${rw*1}px;
+    border-width:1px;
     border-color:#D9D9D9;
-    font-size:${rw*14}px;
+    font-size:14px;
     font-weight:400;
     text-align:center;
 `;
 const StyledTermsModal = styled(Modal)`
-    height:${rh*255}px;
-    border-top-right-radius:${rw*25}px;
-    border-top-left-radius:${rw*25}px;
-    top:${rh*10}px;
+    height:300px;
+    border-top-right-radius:25px;
+    border-top-left-radius:25px;
 `;
 const StyledTermsView = styled.View`
-    padding:${rh*20}px;
+    padding:20px;
 `;
 const StyledSubmit = styled.Text`
     border-radius:5px;
-    line-height:${rw*40}px
+    line-height:48px
     background:#F33562;
     overflow:hidden;
     text-align:center;
     color:#fff;
-    font-size:${rw*15}px;
+    font-size:16px;
     font-weight:600;
-    margin-top:${rh*20}px;
+    margin-top:20px;
 `;
 const StyledRequired = styled.Text`
     color:#999;
-    font-size:${rw*13}px;
+    font-size:14px;
 `;

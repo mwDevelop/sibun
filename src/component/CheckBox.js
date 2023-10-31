@@ -2,7 +2,6 @@
 import React, {useState, useLayoutEffect} from 'react';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 //render
@@ -46,13 +45,13 @@ export default React.memo(({fullText='전체 동의', list=[], termsHandler=()=>
     return ( 
         <StyledConatainer>
             <StyledRow style={{backgroundColor:'#F5F5F5'}}>
-                <StyledCheckBox name="checkbox" size={rw*17} selected={fullAgree} suppressHighlighting={true} onPress={() => fullCheck(!fullAgree)}/>
+                <StyledCheckBox name="checkbox" size={19} selected={fullAgree} suppressHighlighting={true} onPress={() => fullCheck(!fullAgree)}/>
                 <StyledText style={{fontWeight:"700"}}>{fullText}</StyledText>
             </StyledRow>
             {
                 list.map((item, index) => (
                     <StyledRow key={index}>  
-                        <StyledCheckBox name="checkbox" size={rw*17} selected={item.selected} onPress={() => eachCheck(index, !item.selected)} suppressHighlighting={true}/>
+                        <StyledCheckBox name="checkbox" size={19} selected={item.selected} onPress={() => eachCheck(index, !item.selected)} suppressHighlighting={true}/>
                         <StyledText>{item.title} {item.required? "(필수)" : "(선택)"}</StyledText>
                     </StyledRow>
                 ))
@@ -65,15 +64,15 @@ export default React.memo(({fullText='전체 동의', list=[], termsHandler=()=>
 const StyledConatainer = styled.View`
 `;
 const StyledRow = styled.View`
-    padding:${rw*6}px;
-    border-radius:${rw*5}px;
+    padding:8px;
+    border-radius:5px;
     flex-direction:row;
 `;
 const StyledCheckBox = styled(Icon)`
     color:${(props) => props.selected ? '#F33562' : '#D9D9D9'};
 `;
 const StyledText = styled.Text`
-    line-height:${rh*14}px;
-    margin-left:${rw*9}px;
+    line-height:19px;
+    margin-left:10px;
     color:#444;
 `;

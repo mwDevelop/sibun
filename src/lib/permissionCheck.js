@@ -1,6 +1,7 @@
 //------------------------------ MODULE --------------------------------
 import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import { Alert, Linking } from 'react-native';
+import { Platform } from 'react-native';
 
 //----------------------------- FUNCTION -------------------------------
 /* 
@@ -18,8 +19,11 @@ import { Alert, Linking } from 'react-native';
         => DENIED일 경우 계속해서 request 요청 but blocked return 될 경우는 SETTING으로 리다이렉트
 */
 
-export default async function permissionCheck(device, type, onlyChk = false){
+export default async function permissionCheck(type, onlyChk = false){
     try{
+        const os = Platform.OS;
+        const version = Platform.Version;
+        console.log(version);
         const options = {
             'ios' : {
                 'location' : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
@@ -29,7 +33,7 @@ export default async function permissionCheck(device, type, onlyChk = false){
             'android' : {
                 'location' : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
                 'camera' : PERMISSIONS.ANDROID.CAMERA,
-                'photo' : PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
+                'photo' : PERMISSIONS.ANDROID[version >= 33 ? 'READ_MEDIA_IMAGES' : 'READ_EXTERNAL_STORAGE'],
             }
         }
     
@@ -63,13 +67,13 @@ export default async function permissionCheck(device, type, onlyChk = false){
                 );
             }
     
-            check(options[device][type])
+            check(options[os][type])
             .then((result) => {
                 switch (result) {
                     case RESULTS.DENIED:
                         console.log('The permission has not been requested / is denied but requestable');
-                        request(options[device][type]).then((res) => {
-                            if(device == 'android' && res == 'blocked' && !onlyChk) settingAlert();
+                        request(options[os][type]).then((res) => {
+                            if(os == 'android' && res == 'blocked' && !onlyChk) settingAlert();
                             resolve('denied');
                         }).catch((error) => console.log(error));
                         break;

@@ -4,7 +4,6 @@ import React, { useLayoutEffect } from 'react';
 import Modal from 'react-native-modalbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { permissionCheck } from '@/lib';
-import { Platform } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 
 //---------------------------- COMPONENT -------------------------------
@@ -12,7 +11,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 export default React.memo(({open = false, close=()=>{}, dataHandler=() => {}, title="업로드 방법을 선택 해 주세요!", size=100, max=1}) => {
     //function
     const connectAlbum = async() => {
-        const chkResult = await permissionCheck(Platform.OS, 'photo');
+        const chkResult = await permissionCheck('photo');
         if(chkResult != "granted" && chkResult != "limited") return close();
         ImagePicker.openPicker({
             compressImageMaxWidth: size,
@@ -31,7 +30,7 @@ export default React.memo(({open = false, close=()=>{}, dataHandler=() => {}, ti
     }    
 
     const connectCamera = async() => {
-        const chkResult = await permissionCheck(Platform.OS, 'camera');
+        const chkResult = await permissionCheck('camera');
         if(chkResult != "granted" && chkResult != "limited") return close();
         ImagePicker.openCamera({
             compressImageMaxWidth: size,

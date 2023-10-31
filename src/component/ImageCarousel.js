@@ -52,7 +52,7 @@ export default function ImageCarousel({data, renderStyle={}, carouselOption={}, 
                         <StyledSliderImage style={renderStyle} source={{uri: item}} resizeMode="contain" defaultSource={onerror}/>                        
                     )}
                     sliderWidth={SLIDER_WIDTH}
-                    itemWidth={SLIDER_WIDTH-slideGap}
+                    itemWidth={SLIDER_WIDTH-slideGap*2}
                     onSnapToItem={(index) => setPageIndex(index)}
                     {...carouselOption}
                     firstItem={firstItem}

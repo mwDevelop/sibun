@@ -5,7 +5,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import { star_filled, onerror } from '@/assets/img';
 import Geolocation from "react-native-geolocation-service";
-import { Platform } from 'react-native';
 import { permissionCheck, getDistance, timeToNumber } from '@/lib';
 import { useNavigation } from '@react-navigation/native';
 import { useRecoilValue } from 'recoil';
@@ -28,7 +27,7 @@ export default React.memo(({ title = "근처 매장 목록 보기", list = [] })
 
     //function
     const distanceFilter = async(li) => {
-        const chkResult = await permissionCheck(Platform.OS, 'location');//chk
+        const chkResult = await permissionCheck('location');//chk
 
         if(chkResult == "granted"){
             Geolocation.getCurrentPosition( //intermittently can't get position, then execute error block

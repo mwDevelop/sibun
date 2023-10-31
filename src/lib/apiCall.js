@@ -36,7 +36,7 @@ apiCall.interceptors.response.use(
             //console.log('* ACCESS EXPIRED ...');
             const refreshToken = await AsyncStorage.getItem('refresh');
             if(!refreshToken) return refreshResult; //exit when token is empty
-            const refreshResult = await axios.get(`${Config.APP_API_URL}//auth/refresh`, {headers : {Authorization : `Bearer ${refreshToken}`}});
+            const refreshResult = await axios.get(`${Config.APP_API_URL}/auth/refresh`, {headers : {Authorization : `Bearer ${refreshToken}`}});
             if(refreshResult.data.result == "000"){
                 //console.log('* TOKEN REFRESHED ...');
                 const originalRequest = response.config;

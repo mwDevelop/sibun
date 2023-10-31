@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NetInfo from "@react-native-community/netinfo";
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function NetworkError(){
@@ -40,29 +39,29 @@ const StyledConatainer = styled.View`
     justify-content:center;
 `;
 const StyledIcon = styled(Icon)`
-    font-size:${rw*80}px;
+    font-size:80px;
     color:#444;
 `;
 const StyledMain = styled.Text`
     font-weight:600;
-    font-size:${rw*20}px;
+    font-size:20px;
     color:#888;
-    margin:${rh*5}px; 0;
+    margin:5px; 0;
 `;
 const StyledDesc = styled.Text`
-    font-size:${rw*15}px;
+    font-size:15px;
     color:#888;
-    margin-bottom:${rh*20}px;
+    margin-bottom:20px;
 `;
 const StyledButton = styled.TouchableOpacity`
-    margin:${rh*5}px 0;
+    margin:5px 0;
     width:40%;
-    height:${rh*45}px;
-    border-width:${rw*1};
+    height:45px;
+    border-width:1px;
     border-color:#777;
     align-items:center;
     justify-content:center;
-    border-radius:${rw*30}px;
+    border-radius:30px;
 `;
 const StyledButtonText = styled.Text`
     font-weight:600;

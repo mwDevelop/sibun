@@ -3,7 +3,6 @@ import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
 import { korean_logo } from '@/assets/img';
 import { useNavigation } from '@react-navigation/native';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Start(){
@@ -28,21 +27,21 @@ const StyledConatainer = styled.View`
 `;
 const StyledLogo = styled(FastImage)`
     margin-top:60%;
-    height:${rh*140}px;
+    height:150px;
     width:40%;
 `;
 const StyledDesc = styled.Text`
     text-align:center;
-    line-height:${rh*24}px;
+    line-height:23px;
     color:#444;
     font-weight:500;
-    font-size:${rw*14}px;
+    font-size:15px;
 `;
 const StyledNextButton = styled.Text`
     position:absolute;
-    bottom:${rh*40}px;  
-    right:${rw*25}px;
+    bottom:50px;  
+    right:25px;
     font-weight:400;
-    font-size:${rw*15}px;
+    font-size:16px;
     color:#F33562;
 `;

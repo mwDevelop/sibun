@@ -13,8 +13,7 @@ import { DevicePositionAtom } from '@/data/global';
 import { useRecoilState } from 'recoil';
 import Geolocation from "react-native-geolocation-service";
 import Toast from 'react-native-toast-message';
-import { Platform } from 'react-native';
-import { rw, rh } from '@/data/globalStyle';
+import { Linking } from 'react-native';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Desc({route}){
@@ -41,12 +40,12 @@ export default function Desc({route}){
     //function
     const positionUpdate = async() => {
         try{
-            const chkResult = await permissionCheck(Platform.OS, 'location');//chk
+            const chkResult = await permissionCheck('location');//chk
             return (chkResult != "granted") ? //set location
                 Toast.show({
                     type: 'bad',
                     text1: '위치정보 사용을 위해 권한을 허용해 주세요.',
-                    topOffset: rh*120,
+                    topOffset: 120,
                     visibilityTime: 1000
                 }) : 
                 Geolocation.getCurrentPosition(
@@ -59,7 +58,7 @@ export default function Desc({route}){
                         Toast.show({
                             type: 'bad',
                             text1: error.message,
-                            topOffset: rh*120,
+                            topOffset: 120,
                             visibilityTime: 1000
                         });                                          
                     },
@@ -125,6 +124,7 @@ export default function Desc({route}){
 
     const storeGear = useMemo(() => {
         const usingData = storeNew || legacy;
+        const callNumber = () => Linking.openURL(`tel:${usingData.store_tel}`);
         return (
             <>
                 <StyledSection>
@@ -151,7 +151,7 @@ export default function Desc({route}){
                                 }
                             })}
                         >
-                            지도이동<Icon name="chevron-forward-outline" size={rw*14}/>
+                            지도이동<Icon name="chevron-forward-outline" size={13.5}/>
                         </StyledSectionRightButton>
                     </StyledSectionRow>                    
                     <StyledSectionRow>
@@ -161,7 +161,7 @@ export default function Desc({route}){
                         </StyledScore>
                         <StyledReviewSemiButtonBox onPress={() => navigation.navigate('리뷰', {storeIdx : usingData.store_idx})}>
                             <StyledReviewSemiButton>
-                                리뷰 {usingData.store_review_cnt || 0}개<Icon name="chevron-forward-outline" size={rw*11}/>
+                                리뷰 {usingData.store_review_cnt || 0}개<Icon name="chevron-forward-outline" size={11}/>
                             </StyledReviewSemiButton>
                         </StyledReviewSemiButtonBox>
                     </StyledSectionRow>
@@ -184,9 +184,9 @@ export default function Desc({route}){
                         <StyledSectionRowTitle>전화</StyledSectionRowTitle>
                         <StyledStoreTelContainer>
                             <StyledStoreTelBox>
-                                <StyledStoreTelText>{mobileMask(usingData.store_tel || null)}</StyledStoreTelText>
+                                <StyledStoreTelText onPress={callNumber}>{mobileMask(usingData.store_tel || null)}</StyledStoreTelText>
                             </StyledStoreTelBox>
-                            <StyledSectionRightButton>전화하기<Icon name="chevron-forward-outline" size={rw*14}/></StyledSectionRightButton>
+                            <StyledSectionRightButton onPress={callNumber}>전화하기<Icon name="chevron-forward-outline" size={13.5}/></StyledSectionRightButton>
                         </StyledStoreTelContainer>
                     </StyledSectionRow>
                 </StyledSection>
@@ -226,7 +226,7 @@ export default function Desc({route}){
                                 </StyledStorePriceCnt>
                                 <StyledStorePriceUnderline/>
                                 <StyledStorePriceDisplay>
-                                    {Number(data.item.store_pricing_price).toLocaleString('en-US')}원
+                                    {Number(data.item.store_pricing_price).toLocaleString()}원
                                 </StyledStorePriceDisplay>
                             </StyledStorePriceRow>
                         )}                                            
@@ -265,7 +265,7 @@ export default function Desc({route}){
         return (
             <StyledSection style={{borderBottomWidth:0}}>
                 <StyledSectionRow style={{justifyContent:"space-between"}}>
-                    <StyledSectionRowTitle style={{width:rw*130}}>
+                    <StyledSectionRowTitle style={{width:100}}>
                         리뷰({review.length}){'   '}
                         <StyledScore>
                             <StyledScoreStar source={star_filled} resizeMode='contain'/> {Number(storeNew.store_review_avg).toFixed(1)}
@@ -277,7 +277,7 @@ export default function Desc({route}){
                         suppressHighlighting={true}
                     >
                         더보기
-                    <Icon name="chevron-forward-outline" size={rw*14}/></StyledSectionRightButton>                        
+                    <Icon name="chevron-forward-outline" size={13.5}/></StyledSectionRightButton>                        
                 </StyledSectionRow>            
                 <ReviewListView data={review.slice(0,2)}/>
                 <StyledReviewShowButton suppressHighlighting={true} onPress={() => navigation.navigate('리뷰', {storeIdx})}>리뷰더보기</StyledReviewShowButton>
@@ -332,68 +332,68 @@ const StyledScrollContainer = styled.ScrollView`
     flex:1;
 `;
 const StyledHeader = styled.View`
-    height: ${rh*50}px;
+    height: 50px;
     flex-direction:row;
     align-items:center;
     justify-content:space-between;
-    padding-right:${rh*15}px;
-    padding-left:${rw*8}px;
-    border-bottom-width:${rw*1}px;
+    padding-right:15px;
+    padding-left:8px;
+    border-bottom-width:1px;
     border-color:#E9E9E9;
 `;
 const StyledHeaderLeft = styled.View`
 `;
 const StyledHeaderRight = styled.View`
     flex-direction:row;
-    width:${rw*80}px;
+    width:80px;
     justify-content:flex-end;
 `;
 const StyledBackIcon = styled(Icon)`
-    font-size:${rw*35}px;
+    font-size:35px;
 `;
 const StyledIconTouch = styled.TouchableOpacity`
-    margin-left:${rw*25}px;
+    margin-left:25px;
 `;
 const StyledHeartIcon = styled(FastImage)`
-    height:${rh*30}px;
-    width:${rw*30}px;
+    height:30px;
+    width:30px;
 `;
 const StyledShareIcon = styled(FastImage)`
-    height:${rh*29}px;
-    width:${rw*29}px;
+    height:30px;
+    width:30px;
 `;
 const StyledBody = styled.View`
 `;
 const StyledSlide = styled.View`
-    height:${rh*330}px;
+    height:430px;
     background : #fff;
 `;
 const StyledContent = styled.View`
 `;
 const StyledSection = styled.View`
-    padding:${rh*15}px ${rw*20}px;
+    padding:15px 20px;
     border-bottom-width:1px;
     border-color:#E9E9E9;
 `;
 const StyledSectionRow = styled.View`
     flex-direction:row;
-    padding:${rh*4}px 0;
+    padding:5px 0;
     align-items:center;
 `;
 const StyledStoreName = styled.Text`
-    font-size:${rw*18}px;
+    font-size:18px;
     font-weight:700;
     color:#222;
 `;
 const StyledStoreDistance = styled.Text`
     background:#F33562;
     border-radius:5px;
-    margin-left:${rw*10}px;
-    font-size:${rw*12}px;
+    margin-left:10px;
+    font-size:12px;
     color:#fff;
     overflow:hidden;
-    line-height:${rh*18}px;
-    padding: 0 ${rw*3}px;
+    line-height:18px;
+    padding: 0 3px;
 `;
 const StyledStoreAddress = styled.Text`
     color:#444;
@@ -404,31 +404,31 @@ const StyledSectionRightButton = styled.Text`
 `;
 const StyledScoreTitle = styled.Text`
     color:#222;
-    margin-right:${rw*10}px;
+    margin-right:10px;
 `;
 const StyledScore = styled.Text`
     color:#F33562;
     
 `;
 const StyledScoreStar = styled(FastImage)`
-    width:${rw*13}px;
-    height:${rh*13}px;
+    width:13px;
+    height:13px;
 `;
 const StyledReviewSemiButtonBox = styled.TouchableOpacity`
-    margin-left:${rw*10}px;
-    border-bottom-width:${rw*1}px;
+    margin-left:10px;
+    border-bottom-width:1px;
     border-color:#444;
     justify-content:center;
 `;
 const StyledReviewSemiButton = styled.Text`
     justify-content:center;
     color:#444;
-    font-size:${rw*12}px;
+    font-size:12px;
 `;
 const StyledSectionRowTitle = styled.Text`
     font-weight:700;
     color:#444;
-    width:${rw*70}px;
+    width:70px;
 `;
 const StyledStoreTime = styled.Text`
     flex:4;
@@ -439,7 +439,7 @@ const StyledStoreTelContainer = styled.View`
     flex-direction:row;
 `;
 const StyledStoreTelBox = styled.TouchableOpacity`
-    border-bottom-width:${rh*1}px;
+    border-bottom-width:1px;
     border-color:#FFA0B1;
 `;
 const StyledStoreTelText = styled.Text`
@@ -450,15 +450,15 @@ const StyledHighlight = styled.Text`
     color:#F33562;
 `;
 const StyledStorePriceBox = styled.FlatList`
-    margin-top:${rw*5}px;
-    padding:${rh*20}px;
-    border-width:${rw*1}px;
+    margin-top:5px;
+    padding:20px;
+    border-width:1px;
     border-color:#7D7D7D;
     border-radius:10px;
 `;
 const StyledStorePriceRow = styled.View`
     flex-direction:row;
-    padding: ${rh*5}px 0;
+    padding: 5px 0;
 `;
 const StyledStorePriceTime = styled.Text`
     flex:2;
@@ -471,20 +471,20 @@ const StyledStorePriceCnt = styled.Text`
 `;
 const StyledStorePriceUnderline = styled.View`
     flex:5;
-    border-bottom-width:${rh*1}px;
+    border-bottom-width:1px;
     border-bottom-color:black;
 `;
 const StyledStorePriceDisplay = styled.Text`
     font-weight:700;
-    padding-left:${rh*20}px;
+    padding-left:20px;
 `;
 const StyledHashTagBox = styled.View`
-    border-width:${rh*1}px;
+    border-width:1px;
     border-color:#222;
     border-radius:50px;
-    padding:${rh*5}px ${rw*8}px ${rh*4}px ${rh*8}px;  
-    margin-top: ${rh*10}px;
-    margin-right: ${rw*10}px;
+    padding:5px 8px 4px 8px;  
+    margin-top: 10px;
+    margin-right: 10px;
 `;
 const StyledHashTagText = styled.Text`
     color:#222;
@@ -494,8 +494,8 @@ const StyledReviewShowButton = styled.Text`
     border-width:1px;
     border-color:#7D7D7D;
     border-radius:10px;
-    line-height:${rh*42}px;
-    margin-bottom:${rh*50}px;
+    line-height:42px;
+    margin-bottom:50px;
     text-align:center;
     color:#222;
     font-weight:600;
@@ -509,6 +509,6 @@ const StyledSubmit = styled.TouchableOpacity`
 const StyledSubmitText = styled.Text`
     color:#FFF;
     font-weight:600;
-    font-size:${rw*15}px;
-    line-height:${rh*60}px;
+    font-size:16px;
+    line-height:60px;
 `;

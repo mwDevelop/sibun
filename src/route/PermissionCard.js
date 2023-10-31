@@ -1,10 +1,8 @@
 //------------------------------ MODULE --------------------------------
-import { Platform } from 'react-native';
 import { useState, useLayoutEffect } from 'react';
 import { permissionCheck } from '@/lib';
 import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
-import { rw } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function PermissionCard(){
@@ -22,7 +20,7 @@ export default function PermissionCard(){
     //function
     const recursiveReq = (cnt) => {
         try{
-            permissionCheck(Platform.OS, permissions[cnt][0]).then((data) => {
+            permissionCheck(permissions[cnt][0]).then((data) => {
                 try{
                     cnt++; 
                     if(cnt >= permissions.length) return navigation.replace("Login");
@@ -62,5 +60,5 @@ const StyledConatainer = styled.View`
 const StyledHeaderText = styled.Text`
     font-weight:bold;
     color:#fff;
-    font-size:${rw*24}px;
+    font-size:25px;
 `;

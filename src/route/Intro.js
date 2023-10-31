@@ -6,7 +6,6 @@ import FastImage from 'react-native-fast-image';
 import { intro_map, intro_coupon, intro_schedule } from '@/assets/img';
 import { Dimensions, Animated } from 'react-native';
 import { useRef, useMemo, useState } from 'react';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Intro(){
@@ -30,9 +29,9 @@ export default function Intro(){
     ];
     const navigation = useNavigation();
     const flatListRef = useRef();
-    const dot0 = useRef(new Animated.Value(rw*12)).current;
-    const dot1 = useRef(new Animated.Value(rw*12)).current;
-    const dot2 = useRef(new Animated.Value(rw*12)).current;
+    const dot0 = useRef(new Animated.Value(13)).current;
+    const dot1 = useRef(new Animated.Value(13)).current;
+    const dot2 = useRef(new Animated.Value(13)).current;
 
     //state
     const [pageId, setPageId] = useState(0);
@@ -51,17 +50,17 @@ export default function Intro(){
     //memo
     const paginationGear = useMemo(() => {
         Animated.timing(dot0, {
-            toValue: pageId == 0 ? rw*25 : rw*12,
+            toValue: pageId == 0 ? 25 : 13,
             duration: 250,
             useNativeDriver: false
         }).start();     
         Animated.timing(dot1, {
-            toValue: pageId == 1 ? rw*25 : rw*12,
+            toValue: pageId == 1 ? 25 : 13,
             duration: 250,
             useNativeDriver: false
         }).start();     
         Animated.timing(dot2, {
-            toValue: pageId == 2 ? rw*25 : rw*12,
+            toValue: pageId == 2 ? 25 : 13,
             duration: 250,
             useNativeDriver: false
         }).start();                           
@@ -120,7 +119,7 @@ const StyledContainer = styled.View`
     background:#FFF;
     width:${width}px;
     height:100%;
-    padding:${rh*80}px ${rw*20}px;
+    padding:80px 20px;
 `;
 const StyledHeader = styled.View`
 `;
@@ -131,16 +130,16 @@ const StyledTitle = styled.Text`
 `;
 const StyledDesc = styled.Text`
     color:#444;
-    font-size:${rw*14}px;
+    font-size:15px;
     font-weight:400;
-    line-height:${rh*19}px;
-    margin:${rh*15}px 0;
+    line-height:23px;
+    margin:16px 0;
 `;
 const StyledBody = styled.View`
-    height:${rw*270}px;
-    width:${rw*270}px;
+    height:300px;
+    width:300px;
     align-self:center;
-    margin-top:${rh*10}px;
+    margin-top:15px;
 `;
 const StyledImage = styled(FastImage)`
     height:100%;
@@ -148,18 +147,18 @@ const StyledImage = styled(FastImage)`
 const StyledPassButton = styled.Text`
     color:#7D7D7D;
     font-weight:400;
-    font-size:${rw*15}px;
+    font-size:16px;
 `;
 const StyledNextButton = styled.Text`
     font-weight:400;
-    font-size:${rh*15}px;
+    font-size:16px;
     color:#F33562;
 `;
 const StyledPaginationContainer = styled.View`
     flex-direction:row;
     background:black;
     justify-content:space-between;
-    padding:${rh*40}px ${rw*25}px;
+    padding:50px 25px;
     background:#fff;
     align-items:center;
 `;
@@ -170,8 +169,8 @@ const StyledPaginationDotBox = styled.View`
 const StyledPaginationDotTouch = styled.TouchableOpacity`
 `;
 const StyledPaginationDot = styled(Animated.View)`
-    height:${rw*12}px;
-    width:${rw*12}px;
+    height:13px;
+    width:13px;
     border-radius:8px;
-    margin:0 ${rw*4}px;
+    margin:0 5px;
 `;

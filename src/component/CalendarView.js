@@ -4,6 +4,8 @@ import { useState, useLayoutEffect } from 'react';
 import {timeToText} from '@/lib'
 import styled from 'styled-components/native';
 import { useIsFocused } from '@react-navigation/native';
+import { under_balloon } from '@/assets/img';
+import FastImage from 'react-native-fast-image';
 
 //------------------------------ SETTING --------------------------------
 LocaleConfig.locales['kr'] = {
@@ -56,8 +58,9 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
     const bubbleCount = (cnt) => {
         return (
             <StyledBubbleView>
-                <StyledBubbleText>+{cnt}</StyledBubbleText>
-                <BubbleArrow/>
+                <StyledBubbleImage source={under_balloon} resizeMode='contain'>
+                    <StyledBubbleText>+{cnt}</StyledBubbleText>
+                </StyledBubbleImage>
             </StyledBubbleView>
         )
     }
@@ -195,24 +198,19 @@ export default function CalendarView({ initDate = null, dateChange = () => {}, s
 
 //------------------------------- STYLE --------------------------------
 const StyledBubbleView = styled.TouchableOpacity`
-    background:#F33562;
-    padding:0.35px 7px;
-    margin:-8.5px 0 0 0;
-    border-radius:3px;
-    position: static;
-    bottom:-14px;
+    right:8px;
 `;
-const BubbleArrow = styled.TouchableOpacity`
-    background:#F33562;
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    transform: rotate(45deg);
-    bottom: 5px;
-    left: 10px;
-    z-index:-1;
+const StyledBubbleImage = styled(FastImage)`
+    width:22px;
+    height:18px;
+    position:absolute;
+    left:-3px;
+    top:-2px;
+    align-items:center;
+    justify-content:center;
 `;
 const StyledBubbleText = styled.Text`
     font-size:10px;
     color:white;
+    top:1.8px;
 `;

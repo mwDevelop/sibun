@@ -8,7 +8,6 @@ import { map_target, map_list } from '@/assets/img';
 import { useRef, useLayoutEffect, useMemo, useState, useEffect } from 'react';
 import Geolocation from "react-native-geolocation-service";
 import { permissionCheck, timeToNumber } from '@/lib';
-import { Platform } from 'react-native';
 import { defaultLocation } from '@/data/constants';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { star_filled, golf_active, golf_heart_active, onerror } from '@/assets/img';
@@ -22,7 +21,7 @@ export default function MapView({
     markerData = [], 
     onCenterChange = () => {}, 
     listOpen = () => {}, 
-    targetStore=null,
+    targetStore = null,
 }){
     //init
     const mapRef = useRef();
@@ -35,7 +34,7 @@ export default function MapView({
     //function
     const selfTarget = async() => {
         try{
-            const chkResult = await permissionCheck(Platform.OS, 'location');//chk
+            const chkResult = await permissionCheck('location');//chk
 
             return (chkResult != "granted") ? //set location
                 Toast.show({

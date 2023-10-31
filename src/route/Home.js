@@ -8,7 +8,6 @@ import FastImage from 'react-native-fast-image';
 import { useBanner, useCategory, useStore, useUser } from '@/hooks';
 import { timeToNumber } from '@/lib';
 import { korean_logo, onerror } from '@/assets/img';
-import { rh, rw } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Home(){
@@ -62,7 +61,7 @@ export default function Home(){
     ), []);
 
     const bannerGear = useMemo(() => banners?.length ? (
-        <StyledSection style={{height:rh*180}}>
+        <StyledSection style={{height:200}}>
             <ImageCarousel data={banners.map((i) => i.bn_img_src)} renderStyle={{borderRadius:10}} slideGap={60} carouselOption={{loop:true}}/>
         </StyledSection>
     ): null, [banners]);
@@ -95,11 +94,11 @@ export default function Home(){
         <StyledSection>
             <StyledSectionHeader>                
                 <StyledSectionTitle>지금 바로 {<StyledHighLight>예약가능한</StyledHighLight>} 매장</StyledSectionTitle>
-                <StyledSectionHeaderRear><Icon name="refresh" size={rw*19}/></StyledSectionHeaderRear>
+                <StyledSectionHeaderRear><Icon name="refresh" size={20}/></StyledSectionHeaderRear>
             </StyledSectionHeader>
             <StyledSectionContent style={{padding:0}}> 
                 {
-                    <CustomCarousel carouselOption={{itemWidth:rw*140}}>
+                    <CustomCarousel carouselOption={{itemWidth:150}}>
                         {available.map((i, index) => nowListTemplate(i, index))}
                     </CustomCarousel>
                 }
@@ -143,94 +142,94 @@ const StyledWindow = styled.ScrollView`
 `;
 const StyledConatainer = styled.View`
     flex-direction:column;
-    padding:${rh*20}px 0px;
+    padding:20px 0px;
 `;
 const StyledHeader = styled.View`
     flex-direction:row;
     justify-content:space-between;
     align-items:flex-end;
-    padding: 0 ${rw*20}px;
+    padding: 0 20px;
 `;
 const StyledHeaderImage = styled(FastImage)`
-    width:${rw*100}px;  
-    height:${rh*50}px;  
-    margin-left:${rw*10}px;
+    width:100px;  
+    height:50px;  
+    margin-left:10px;
 `;
 const StyledHeaderSubText = styled.Text`
-    padding-bottom: ${rh*4}px;
+    padding-bottom: 4px;
     right:15px;
 `;
 const StyledHeaderSearchIcon = styled(Icon)`
-    font-size:${rh*25}px;
+    font-size:25px;
     padding-bottom: 4px;
 `;
 const StyledSection = styled.View`
-    margin: ${rh*10}px 0px;
+    margin: 10px 0px;
     justify-content:center;
 `;
 const StyledSectionHeader = styled.View`
     flex-direction:row;
     justify-content:space-between;
-    padding: ${rh*5}px ${rw*20}px;
+    padding: 5px 20px;
 `;
 const StyledSectionTitle = styled.Text`
-    font-size:${rw*20}px;
+    font-size:20px;
     font-weight:600;
 `;
 const StyledSectionHeaderRear = styled.Text`
-    font-size:${rw*13}px;
-    top:${rh*4}px;
+    font-size:13px;
+    top:5px;
 `;
 const StyledHighLight = styled.Text`
     color:#F33562;
 `;
 const StyledSectionContent = styled.View`
-    margin:${rh*5}px 0;
+    margin:5px 0;
 `;
 const StyledCategoryRow = styled.View`
     flex-direction:row;
-    margin:${rh*5}px ${rw*20}px;
+    margin:5px 20px;
     align-items:center;
 `;
 const StyledCategoryItems = styled.TouchableOpacity`
-    margin-right:${rw*20}px;
+    margin-right:20px;
     align-items:center;
     flex-direction:column;
 `;
 const StyledCategoryIconView = styled.View`
     background:#f1f1f1;
-    padding:${rw*8}px;
+    padding:8px;
     border-radius:8px;
 `;
 const StyledCategoryImg = styled(FastImage)`
-    width:${rw*48}px;
-    height:${rw*48}px;  
+    width:50px;
+    height:50px;  
 `;
 const StyledCategoryText = styled.Text`
-    margin:${rw*5}px 0;
+    margin:5px 0;
     font-weight:600;
 `;
 
 const StyledNowTemplateView = styled.TouchableOpacity`
-    padding-left:${rw*20}px;
+    padding-left:20px;
 `;
 const StyledNowTemplateImage = styled(FastImage)`
-    height:${rh*120}px;
+    height:130px;
     background:black;
     border-radius:8px;
 `;
 const StyledNowTemplateTitle = styled.Text`
     font-weight:500;
     color:#222;
-    padding-top:${rw*5}px;
+    padding-top:5px;
 `;
 const StyledNowTemplateSub = styled.Text`
     font-weight:500;
     color:#7D7D7D;
-    font-size:${rw*12}px;
-    padding-top:${rh*5}px;
+    font-size:12px;
+    padding-top:5px;
 `;
 const StyledNowTemplateCnt = styled.Text`
-    padding-top:${rh*5}px;
-    font-size:${rw*11}px;
+    padding-top:5px;
+    font-size:12px;
 `;

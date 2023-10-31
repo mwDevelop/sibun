@@ -41,7 +41,7 @@ export default function Schedule(){
     }, [reservation]);
 
     const listGear = useMemo(() => {
-        if(!chkDate || !reservation) return <StyledLoginMessage>예약 데이터가 존재하지 않습니다</StyledLoginMessage>;
+        if(!chkDate || !reservation) return <StyledEmptyMessage>예약 데이터가 존재하지 않습니다</StyledEmptyMessage>;
         const now = new Date(chkDate);
         const date = now.getDate();
         const day = now.getDay();
@@ -89,7 +89,7 @@ export default function Schedule(){
     //render
     return(
         <StyledConatainer>
-            <CustomInnerLoading delay={1000}/>
+            <CustomInnerLoading delay={1000} paddingTop="70%"/>
             <StyledCalendarSection>
                 {calendarGear}
             </StyledCalendarSection>
@@ -170,7 +170,7 @@ const StyledItemDesc = styled.TouchableOpacity`
     position:absolute;
     bottom: 10px;
     right: 10px;
-    padding:15px 25px;
+    padding: 15px 25px;
     border-color: #F33562;
     border-width: 1.5px;
     border-radius: 50px;
@@ -180,9 +180,9 @@ const StyledItemDescText = styled.Text`
     font-size:15px;
     font-weight:600;
 `;
-const StyledLoginMessage = styled.Text`
+const StyledEmptyMessage = styled.Text`
     text-align:center;
-    top:50px;
-    font-size:18px;
-    color:#aaa;
+    font-size:16px;
+    color:#bbb;
+    padding:50px;
 `;

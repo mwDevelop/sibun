@@ -12,7 +12,6 @@ import { ProfileEditSaveAtom } from '@/data/global';
 import { useRecoilState } from "recoil";
 import Toast from 'react-native-toast-message';
 import { useUser, useUserMutate } from '@/hooks';
-import { rw, rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ProfileEdit(){
@@ -108,7 +107,7 @@ export default function ProfileEdit(){
                 Toast.show({
                     type: 'good',
                     text1: '프로필 정보가 변경되었습니다!',
-                    topOffset: rh*120,
+                    topOffset: 120,
                     visibilityTime: 1000
                 });
             }else{
@@ -221,10 +220,10 @@ export default function ProfileEdit(){
                             inputContainerStyle={{
                                 backgroundColor: '#fff',
                                 borderRadius: 5,
-                                height:rh*48,
+                                height:50,
                                 borderColor:'#eee',
                                 borderWidth:1,
-                                width:rw*160,
+                                width:180,
                                 alignItems:"center"
                             }}
                         /> : null
@@ -341,22 +340,22 @@ const StyledWindow = styled.ScrollView`
     flex:1;
 `;
 const StyledConatainer = styled.View`
-    margin:${rh*10}px ${rw*20}px;
+    margin:10px 20px;
 `;
 const StyledSection = styled.View`
-    margin:${rh*7}px 0;
+    margin:8px 0;
 `;
 const StyledSectionTitle = styled.Text`
     color:#7D7D7D;
-    margin:${rh*2.5}px 0;
+    margin:3px 0;
 `;
 const StyledInput = styled.TextInput`
-    height:${rh*48}px;
+    height:50px;
     border-color:#eee;
     border-width:1px;
     border-radius:5px;
-    padding:0 ${rw*17}px;
-    margin:${rh*5}px 0;
+    padding:0 18px;
+    margin:5px 0;
 `;
 const StyledInnerButton = styled.TouchableOpacity`
     position:absolute;
@@ -364,8 +363,8 @@ const StyledInnerButton = styled.TouchableOpacity`
     right:2%;
     border-color:#D9D9D9;
     border-width:1px;
-    padding:${rw*10}px;
-    border-radius:${rw*20}px;
+    padding:10px;
+    border-radius:20px;
 `;
 const StyledInputBox = styled.View`
 `;
@@ -373,28 +372,28 @@ const StyledInnerButtonText = styled.Text`
     color:#444;
 `;
 const StyledOuterButton = styled.TouchableOpacity`
-    height:${rh*49}px;
+    height:50px;
     align-items:center;
     justify-content:center;
     background:${(props) => props.activeChk ? "#444" : "#F0F0F0"};
-    border-radius:${rh*5}px;
-    margin:${rh*5}px 0;
+    border-radius:5px;
+    margin:5px 0;
 `;
 const StyledOuterButtonText = styled.Text`
     color:${(props) => props.activeChk ? "#FFF" : "#BBB"};
 `;
 const StyledInputMessage = styled.Text`
     color:${(props) => props.passed ? '#2D5198' : 'red'};
-    font-size:${rw*10}px;
+    font-size:10px;
     font-weight:600;
-    margin: ${rw*2}px 0;
+    margin: 2px 0;
 `;
 const StyedButtonArea = styled.View`
-    margin-top:${rh*5}px;
+    margin-top:5px;
     flex-direction:row;
     border-width:1px;
     border-color:#eee;
-    width:${rw*130}px;
+    width:130px;
     border-radius:5px;
     align-items:center;
     overflow:hidden;
@@ -402,40 +401,40 @@ const StyedButtonArea = styled.View`
 const StyledButtonText = styled.Text`
     background:${(props) => props.selected? '#F33562': '#fff'};
     color:${(props) => props.selected? '#fff': '#555'};
-    width:${rw*64}px;
+    width:64px;
     text-align:center;
-    line-height:${rh*43}px;
+    line-height:50px;
     font-weight:600;
 `;
 const StyledEmailArea = styled.View`
     flex-direction:row;
-    height:${rh*49}px;
+    height:50px;
     border-color:#fff;
     border-width:1px;
     border-radius:5px;
-    margin:${rh*5}px 0;
+    margin:5px 0;
     align-items:center;
 `;
 const StyledEmailFront = styled.TextInput`
-    height:${rh*48}px;
+    height:50px;
     border-color:#eee;
     border-width:1px;
     border-radius:5px;
     flex:0.8;
-    padding:0 ${rw*18}px;
+    padding:0 18px;
 `;
 const StyledEmailMiddle = styled.Text`
     flex:0.2;
     text-align:center;
-    font-size:${rw*20}px;
+    font-size:20px;
     color:#555;
 `;
 const StyledBirthText = styled.Text`
-    height:${rh*48}px;
+    height:50px;
     border-color:#eee;
     border-width:1px;
     border-radius:5px;
-    padding:0 ${rw*17}px;
-    margin:${rh*5}px 0;
-    line-height:${rh*44}px;
+    padding:0 18px;
+    margin:5px 0;
+    line-height:48px;
 `;

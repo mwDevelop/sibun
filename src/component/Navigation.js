@@ -64,8 +64,8 @@ const ProfileEditSaveButton = () => {
         <Text 
             onPress={() => saveFlag == 'active' ? setSaveFlag('execute') : null}
             style={{
-                right:rw*9,
-                fontSize:rw*14,
+                right:10,
+                fontSize:15,
                 color:saveFlag == 'active' ? '#F33562' : '#BABABA'
             }}
         >
@@ -83,17 +83,18 @@ const ContentTab = () => {
     return (
         <Tab.Navigator 
             screenOptions={(r)=>({
-                tabBarIcon: ({focused}) => <Image source={r.route.params.icon[focused ? 1 : 0]} style={{height:rw*32, width:rw*32}} resizeMode='contain'/>,
+                tabBarIcon: ({focused}) => <Image source={r.route.params.icon[focused ? 1 : 0]} style={r.route.params.style || {height:rh*28, width:rw*24}} resizeMode='contain'/>,
                 headerShown: false, 
-                tabBarStyle: { height: rh*65, paddingBottom: rh*10 },
+                headerTitleAlign: 'center',
+                tabBarStyle: { height: 70, paddingBottom: 20 },
                 headerTitleStyle: {
-                    fontSize:rw*18,
+                    fontSize:18,
                     fontWeight:600
                 },
                 tabBarShowLabel: false
             })}
         >
-            <Tab.Screen name="홈" component={Home} initialParams={{ icon: [home_gray, home_color] }}/>
+            <Tab.Screen name="홈" component={Home} initialParams={{ icon: [home_gray, home_color], style: {height:rh*30, width:rw*30}}}/>
             <Tab.Screen name="내주변" component={Search} initialParams={{ icon: [location_gray, location_color] }}/>
             <Tab.Screen name="스케줄" component={Schedule} initialParams={{ icon: [document_gray, document_color] }}/>
             {access == 'init' ? null : <Tab.Screen name="마이페이지" component={access ? Mypage : Login} initialParams={{ icon: [person_gray, person_color] }} options={{headerShown: access ? true  : false}}/>}
@@ -110,13 +111,13 @@ const ReservationTab = () => {
                 backgroundColor:'#fff',
             }}
             screenOptions={{   
-                tabBarStyle:{paddingTop:rh*14},
-                tabBarItemStyle: { width: rw*95 },
+                tabBarStyle:{paddingTop:15},
+                tabBarItemStyle: { width: 100 },
                 tabBarPressColor: 'transparent',
                 tabBarActiveTintColor: '#222',
                 tabBarInactiveTintColor: '#7D7D7D',
                 tabBarLabelStyle: {
-                    fontSize: rw*15,
+                    fontSize: 16,
                     fontWeight: 'bold',
                 },    
                 tabBarIndicatorStyle: { backgroundColor: '#222' },                  
@@ -135,12 +136,12 @@ const ReviewTab = () => {
                 backgroundColor:'#fff',
             }}
             screenOptions={{   
-                tabBarStyle:{paddingTop:rh*14, marginRight:rw*19, marginLeft:rw*19},
+                tabBarStyle:{paddingTop:15, marginRight:20, marginLeft:20},
                 tabBarPressColor: 'transparent',
                 tabBarActiveTintColor: '#222',
                 tabBarInactiveTintColor: '#7D7D7D',
                 tabBarLabelStyle: {
-                    fontSize: rw*15,
+                    fontSize: 16,
                     fontWeight: 'bold',
                 },    
                 tabBarIndicatorStyle: { backgroundColor: '#222' },
@@ -179,7 +180,7 @@ const RootStack = () => {
         });
     }
 
-    const backButton = () => <Icon name="chevron-back-outline" size={rw*35} style={{left:rw*7}} />;
+    const backButton = () => <Icon name="chevron-back-outline" size={35} style={{left:10}} />;
 
     //effect
     useLayoutEffect(() => {
@@ -195,10 +196,11 @@ const RootStack = () => {
             initialRouteName ={firstLaunchChk == 'true' ? 'Start' : (access ? 'Content' : 'Login') } 
             //initialRouteName ='Start' 
             screenOptions={(r)=>({
-                headerShown: false, 
+                headerShown: false,
+                headerTitleAlign: 'center', 
                 headerTitleStyle: {
-                    fontSize:rw*17,
-                    fontWeight:600
+                    fontSize:18,
+                    fontWeight:600,
                 },
                 headerBackTitleVisible: false,
                 headerBackImage: backButton,
