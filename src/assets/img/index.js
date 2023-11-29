@@ -42,10 +42,8 @@ export { default as heart_fill } from "./heart_fill.png";
 export { default as heart_flat_empty } from "./heart_flat_empty.png";
 export { default as heart_flat_fill } from "./heart_flat_fill.png";
 
-export { default as golf } from "./golf.png";
 export { default as golf_active } from "./golf_active.png";
-export { default as golf_heart } from "./golf_heart.png";
-export { default as golf_heart_active } from "./golf_heart_active.png";
+export { default as golf_heart_active } from "./golf_active_like.png";
 
 export { default as share } from "./share.png";
 

@@ -1,6 +1,5 @@
 //------------------------------ MODULE --------------------------------
 import { useLayoutEffect, useState, useMemo } from 'react';
-import { Platform, KeyboardAvoidingView, View } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import DatePicker from 'react-native-date-picker';
@@ -12,6 +11,7 @@ import { ProfileEditSaveAtom } from '@/data/global';
 import { useRecoilState } from "recoil";
 import Toast from 'react-native-toast-message';
 import { useUser, useUserMutate } from '@/hooks';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ProfileEdit(){
@@ -38,7 +38,6 @@ export default function ProfileEdit(){
     const [mailRear, setMailRear] = useState(null);
     const [pin, setPin] = useState('');
     const [dateModalOpen, setDateModalOpen] = useState(false);
-    const [focusOffset, setFocusOffset] = useState(100);
     const [realMailList, setRealMailList] = useState(mailList);
     const [initMailId, setInitMailId] = useState(null);
 
@@ -131,7 +130,7 @@ export default function ProfileEdit(){
         return(
             <StyledSection>
                 <StyledSectionTitle>이름</StyledSectionTitle>
-                <StyledInput onFocus={() => setFocusOffset(-1000)} value={name} onChangeText={(text) => setName(text)}/>
+                <StyledInput value={name} onChangeText={(text) => setName(text)}/>
             </StyledSection>
         );
     }, [name]);    
@@ -164,9 +163,9 @@ export default function ProfileEdit(){
         return(
             <StyledSection>
                 <StyledSectionTitle>휴대폰번호</StyledSectionTitle>
-                <StyledInput onFocus={() => setFocusOffset(100)} maxLength={13} returnKeyType={'done'} keyboardType='numeric' value={mobileMask(phone)} onChangeText={(text) => setPhone(numberFilter(text))} />
+                <StyledInput maxLength={13} returnKeyType={'done'} keyboardType='numeric' value={mobileMask(phone)} onChangeText={(text) => setPhone(numberFilter(text))} />
                 <StyledInputBox>
-                <StyledInput onFocus={() => setFocusOffset(100)} maxLength={6} returnKeyType={'done'} keyboardType='numeric' value={pin} onChangeText={(text) => setPin(numberFilter(text))} />
+                <StyledInput maxLength={6} returnKeyType={'done'} keyboardType='numeric' value={pin} onChangeText={(text) => setPin(numberFilter(text))} />
                 {
                     phoneChk == "ing" || phoneChk == "certFail" ? (
                         <StopWatch 
@@ -175,8 +174,7 @@ export default function ProfileEdit(){
                             customStyle={{
                                 position:'absolute',
                                 color:'#FF3A46',
-                                top:'46%',
-                                right:'35%'
+                                right:120
                             }}
                             endEvent = {() => setPhoneChk("certOver")}
                         />
@@ -199,12 +197,11 @@ export default function ProfileEdit(){
             <StyledSection>
                 <StyledSectionTitle>이메일</StyledSectionTitle>
                 <StyledEmailArea>
-                    <StyledEmailFront onFocus={() => setFocusOffset(100)} value={mailFront} onChangeText={(text) => setMailFront(specialCharFilter(text))}/>
+                    <StyledEmailFront value={mailFront} onChangeText={(text) => setMailFront(specialCharFilter(text))}/>
                     <StyledEmailMiddle>@</StyledEmailMiddle>
                     {
                         initMailId !== null ? 
                         <AutocompleteDropdown
-                            onFocus={() => setFocusOffset(100)}
                             clearOnFocus={false}
                             closeOnBlur={true}
                             closeOnSubmit={false}
@@ -320,15 +317,18 @@ export default function ProfileEdit(){
     return(
         <StyledWindow>
             <StyledConatainer>
-                <KeyboardAvoidingView behavior={'position'/*Platform.OS == "ios" ? 'position' : null*/} keyboardVerticalOffset={focusOffset}>
-                {profileImgGear}
-                {nameGear}
-                {genderGear}
-                {birthGear}
-                {emailGear}
-                {phoneGear}
-                {dateModalGear}
-                </KeyboardAvoidingView>
+                <KeyboardAwareScrollView 
+                    extraHeight={90}
+                    enableOnAndroid={true}
+                >
+                    {profileImgGear}
+                    {nameGear}
+                    {genderGear}
+                    {birthGear}
+                    {emailGear}
+                    {phoneGear}
+                    {dateModalGear}
+                </KeyboardAwareScrollView>
             </StyledConatainer>                
         </StyledWindow>
     );
@@ -359,17 +359,23 @@ const StyledInput = styled.TextInput`
 `;
 const StyledInnerButton = styled.TouchableOpacity`
     position:absolute;
-    top:18%;
-    right:2%;
+    top:0;
+    bottom:0;
+    margin:10px 0;
+    right:10px;
     border-color:#D9D9D9;
     border-width:1px;
-    padding:10px;
+    padding:0 10px;
     border-radius:20px;
+    justify-content:center;
 `;
 const StyledInputBox = styled.View`
+    justify-content:center;
 `;
 const StyledInnerButtonText = styled.Text`
     color:#444;
+    font-size:13px;
+    line-height:26px;
 `;
 const StyledOuterButton = styled.TouchableOpacity`
     height:50px;

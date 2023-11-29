@@ -38,7 +38,7 @@ export default function ReviewMyList(){
                             </StyledItemHeader>
                             <StyledStoreContent>
                                 <StyledStoreImageArea>
-                                    <StyledStoreImage source={{uri:d.store_main_simg}} defaultSource={onerror} resizeMode="contain"/>
+                                    <StyledStoreImage source={d.store_main_simg ? {uri:d.store_main_simg} : onerror} defaultSource={onerror} resizeMode="contain"/>
                                 </StyledStoreImageArea>
                                 <StyledStoreInfo>
                                     <StyledStoreName>{d.store_name}</StyledStoreName>

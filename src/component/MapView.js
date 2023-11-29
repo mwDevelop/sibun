@@ -12,7 +12,7 @@ import { defaultLocation } from '@/data/constants';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { star_filled, golf_active, golf_heart_active, onerror } from '@/assets/img';
 import { useNavigation } from '@react-navigation/native';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { DevicePositionAtom } from '@/data/global';
 import Toast from 'react-native-toast-message';
 
@@ -21,12 +21,13 @@ export default function MapView({
     markerData = [], 
     onCenterChange = () => {}, 
     listOpen = () => {}, 
-    targetStore = null,
+    targetStore=null,
 }){
     //init
     const mapRef = useRef();
     const navigation = useNavigation();
-    const setPosition = useSetRecoilState(DevicePositionAtom);
+    //const setPosition = useSetRecoilState(DevicePositionAtom);
+    const [position, setPosition] = useRecoilState(DevicePositionAtom);
 
     //state
     const [shop, setShop] = useState(null);
@@ -58,7 +59,7 @@ export default function MapView({
                         console.log(error);
                         Toast.show({
                             type: 'bad',
-                            text1: error.message,
+                            text1: '다시 시도해 주세요'/*error.message*/,
                             topOffset: 120,
                             visibilityTime: 1000
                         });                                          
@@ -89,6 +90,7 @@ export default function MapView({
                 //nightMode={true}
                 onTouch={e => setShop(null)}
                 onMapClick={e => setShop(null)}
+                useTextureView={true} /*Marker Disappearing Issue in android*/
             >   
             {
                 markerData.map((item, index) => {
@@ -99,11 +101,11 @@ export default function MapView({
                     return (
                         <Marker 
                             key={index}
-                            coordinate={{latitude:Number(item.store_addr_y), longitude:Number(item.store_addr_x)}} 
+                            coordinate={{latitude:Number(item.store_addr_y), longitude:Number(item.store_addr_x)}}
                             onClick={() => setShop(item)}
                             image={imageIcon}
-                            //width={imageWidth}
-                            //height={imageHeight}
+                            width={item.like ? 34: 29}
+                            height={31}
                             /*
                             caption={{
                                 height:20,
@@ -123,6 +125,18 @@ export default function MapView({
                         />
                     )
                 })
+            }
+            {
+                position ? 
+                <Marker //current position marker
+                    coordinate={position}                
+                    width={30}
+                    height={40}
+                    pinColor="blue"
+                    caption={{
+                        text: "내 위치",
+                    }}
+                /> : null
             }
                 {/*<Path coordinates={[P0, P1]} onClick={() => console.warn('onClick! path')} width={10}/>*/}
                 {/*<Polyline coordinates={[P1, P2]} onClick={() => console.warn('onClick! polyline')}/>*/}
@@ -163,7 +177,7 @@ export default function MapView({
                 <StyledShopTouch onPress={() => navigation.navigate('Desc', shop)} activeOpacity={1}>
                 <StyledShopHeader>
                     <StyledShopImageBox>
-                        <StyledShopImage source={{uri:shop.store_main_simg}} resizeMode="cover" defaultSource={onerror}/>
+                        <StyledShopImage source={shop.store_main_simg ? {uri:shop.store_main_simg} : onerror} resizeMode="cover" defaultSource={onerror}/>
                     </StyledShopImageBox>
                     <StyledShopReviewArea>
                         <StyledStarImage source={star_filled}/>
@@ -237,7 +251,7 @@ const StyledShopBox = styled(Animated.View)`
     background:#fff;
     align-self:center;
     border-radius:5px;
-    bottom:15%;
+    bottom:20%;
     shadow-color:black; 
     shadow-offset:5px; 
     shadow-opacity:0.3; 

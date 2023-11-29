@@ -3,7 +3,7 @@ import { useLayoutEffect, useMemo, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { useStore, useUser} from '@/hooks';
 import { CheckBox, CouponSlide } from '@/component';
-import { apiCall, mobileMask, numberFilter, numberToTime, timeToNumber, timeToText, textCut } from '@/lib';
+import { apiCall, mobileMask, numberFilter, numberToTime, timeToNumber, timeToText } from '@/lib';
 import { koreanDay, globalMsg } from '@/data/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { alertDefaultSetting } from '@/data/constants';
@@ -25,13 +25,7 @@ export default function Reservation({route}){
     const [user] = useUser();
 
     //state
-    const [datePicked, setDatePicked] = useState(() => {
-        const holidays = store?.store_closed_days.split(',').map((d, i) => d==7 ? 0 : Number(d));
-        if(holidays?.length > 6) return null; //case everyday disabled
-        let td = new Date();
-        while(holidays.includes(td.getDay())) td.setDate(td.getDate()+1);
-        return td;
-    });
+    const [datePicked, setDatePicked] = useState(new Date());
     const [timePicked, setTimePicked] = useState(null);
     const [usingTimePicked, setUsingTimePicked] = useState(null);
     const [roomPicked, setRoomPicked] = useState(null);
@@ -206,7 +200,7 @@ export default function Reservation({route}){
     }, [store]);
     
     const dateGear = useMemo(() => {
-        const holidays = store?.store_closed_days.split(',').map((d, i) => d==7 ? 0 : Number(d));
+        const holidays = store?.store_closed_days ? store.store_closed_days?.split(',').map((d, i) => d==7 ? 0 : Number(d)) : [];
         return (
             <StyledSubsection>
                 <StyledSubsectionTitle>날짜</StyledSubsectionTitle>
@@ -370,8 +364,8 @@ export default function Reservation({route}){
                                     status={status}
                                     onPress={() => status=='able'?setRoomPicked(v.store_room_idx) : null}
                                 >
-                                    <StyledSubsectionBlockItemText status={status} style={{fontSize:12, height:20}}>
-                                        {textCut(v.store_room_name, 5)}
+                                    <StyledSubsectionBlockItemText numberOfLines={1} ellipsizeMode="tail" status={status} style={{fontSize:12, height:20}}>
+                                        {v.store_room_name}
                                     </StyledSubsectionBlockItemText>
                                     <StyledRoomStatus status={status} style={{fontSize:12}}>
                                         {status == 'unable' ? '예약중' : '예약가능'}
@@ -464,6 +458,15 @@ export default function Reservation({route}){
     useLayoutEffect(() => {
         callRoom();
     }, []);
+
+    useLayoutEffect(() => {
+        if(store?.store_closed_days){
+            const holidays = store?.store_closed_days.split(',').map((d, i) => d==7 ? 0 : Number(d));
+            let td = new Date();
+            while(holidays.includes(td.getDay())) td.setDate(td.getDate()+1);
+            setDatePicked(td);
+        }
+    }, [store]);
 
     useLayoutEffect(() => {
         if(!datePicked) return;
@@ -590,6 +593,7 @@ const StyledRequestInput = styled.TextInput`
     background:#F5F5F5;
     height:100px;
     padding:10px;
+    text-align-vertical:top;
 `;
 const StyledSubmit = styled.Text`
     background:${(props) => props.active ? '#F33562' : '#aaa'};

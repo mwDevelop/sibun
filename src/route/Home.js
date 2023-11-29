@@ -1,13 +1,12 @@
 //------------------------------ MODULE --------------------------------
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { CustomInnerLoading, ImageCarousel, CustomCarousel } from '@/component';
+import { CustomInnerLoading, ImageCarousel, StoreUnitBlock1, StoreUnitBlock2 } from '@/component';
 import { useLayoutEffect, useMemo } from 'react';
 import FastImage from 'react-native-fast-image';
 import { useBanner, useCategory, useStore, useUser } from '@/hooks';
 import { timeToNumber } from '@/lib';
-import { korean_logo, onerror } from '@/assets/img';
+import { korean_logo } from '@/assets/img';
 
 //---------------------------- COMPONENT -------------------------------
 export default function Home(){
@@ -19,6 +18,7 @@ export default function Home(){
     const [ banners, bannersUpdate ] = useBanner();
     const [ category, categoryUpdate ] = useCategory();
     const [ available, availableUpdate ] = useStore(null, {store_oper_time:timeToNumber(new Date()), rpp:10});
+    const [ newList, newListUpdate ] = useStore(null, {rpp:10, col:'store_reg_dt', colby:'desc'});
     const [ user, userUpdate ] = useUser();
 
     //function
@@ -32,37 +32,16 @@ export default function Home(){
         //queryClient.invalidateQueries(['store']);
     }
 
-    const nowListTemplate = (info, index) => {
-        return (
-            <StyledNowTemplateView key={index} activeOpacity={1} onPress={() => navigation.navigate('Desc', info)}>
-                <StyledNowTemplateImage source={{uri:info.store_main_simg}} defaultSource={onerror} resizeMode="contain"/>
-                <StyledNowTemplateTitle>{info.store_name}</StyledNowTemplateTitle>
-                <StyledNowTemplateSub>{info.store_addr}</StyledNowTemplateSub>
-                <StyledNowTemplateCnt>
-                    <Icon name="person-outline" color="black"/> {<StyledHighLight>{10}</StyledHighLight>} / {20}    
-                </StyledNowTemplateCnt>
-            </StyledNowTemplateView>
-        )
-    }    
-
-    const openModal = () => navigation.navigate("ModalGroup");
-
     //memo
     const headerGear = useMemo(() => (
         <StyledHeader>
-                <StyledHeaderImage source={korean_logo} resizeMode='contain'/>
-                {
-                /*
-                <StyledHeaderSubText onPress={() => openModal()}>광진구 중곡동 156-6 <Icon name="caret-down-sharp" /></StyledHeaderSubText>
-                <StyledHeaderSearchIcon name ="md-search-outline" onPress={() => openModal()}/>                    
-                */
-                }
+            <StyledHeaderImage source={korean_logo} resizeMode='contain'/>
         </StyledHeader>
     ), []);
 
     const bannerGear = useMemo(() => banners?.length ? (
         <StyledSection style={{height:200}}>
-            <ImageCarousel data={banners.map((i) => i.bn_img_src)} renderStyle={{borderRadius:10}} slideGap={60} carouselOption={{loop:true}}/>
+            <ImageCarousel data={banners.map((i) => i.bn_img_src)} renderStyle={{borderRadius:10, width:'90%'}} loop={true} carouselOption={{autoPlay:true, autoPlayInterval:3000}}/>
         </StyledSection>
     ): null, [banners]);
 
@@ -94,17 +73,47 @@ export default function Home(){
         <StyledSection>
             <StyledSectionHeader>                
                 <StyledSectionTitle>지금 바로 {<StyledHighLight>예약가능한</StyledHighLight>} 매장</StyledSectionTitle>
-                <StyledSectionHeaderRear><Icon name="refresh" size={20}/></StyledSectionHeaderRear>
             </StyledSectionHeader>
-            <StyledSectionContent style={{padding:0}}> 
+            <StyledSectionContent style={{paddingTop:15}}> 
                 {
-                    <CustomCarousel carouselOption={{itemWidth:150}}>
-                        {available.map((i, index) => nowListTemplate(i, index))}
-                    </CustomCarousel>
+                    <StyledFlatList 
+                        data={available}
+                        keyExtractor={(item) => item.store_idx}
+                        showsHorizontalScrollIndicator={false}
+                        horizontal={true}
+                        renderItem= {({item, index}) => {
+                            return (
+                                <StoreUnitBlock1 unit={item} containerStyle={{width:150, marginLeft:index == 0 ? 20 : 0}}/>
+                            )
+                        }}
+                    />
                 }
             </StyledSectionContent>
         </StyledSection>
     ), [available]);
+
+    const newListGear = useMemo(() => !newList ? null : (
+        <StyledSection>
+            <StyledSectionHeader>                
+                <StyledSectionTitle>새로 {<StyledHighLight>입점한</StyledHighLight>} 신규 매장</StyledSectionTitle>
+            </StyledSectionHeader>
+            <StyledSectionContent style={{paddingTop:15}}> 
+                {
+                    <StyledFlatList 
+                        data={newList}
+                        keyExtractor={(item) => item.store_idx}
+                        showsHorizontalScrollIndicator={false}
+                        horizontal={true}
+                        renderItem= {({item, index}) => {
+                            return (
+                                <StoreUnitBlock2 unit={item} containerStyle={{width:190, marginLeft:index == 0 ? 20 : 0}}/>
+                            )
+                        }}
+                    />
+                }
+            </StyledSectionContent>
+        </StyledSection>
+    ), [newList]);
 
     //effect
     useLayoutEffect(() => {
@@ -112,6 +121,7 @@ export default function Home(){
             bannersUpdate();
             categoryUpdate();
             availableUpdate();
+            newListUpdate();
             userUpdate();
         } 
     }, [isFocused]);
@@ -125,11 +135,11 @@ export default function Home(){
                 {/* ------------------- BANNER SECTION -------------------- */}                
                 {bannerGear}
                 {/* --------------------- CATEGORY SECTION ---------------------- */}
-                {categoryGear}
+                {/*categoryGear*/}
                 {/* --------------------- SECTION 2 ---------------------- */}                
                 {nowListGear}
                 {/* --------------------- SECTION 3 ---------------------- */}                
-                
+                {newListGear}
                 {/* --------------------- SECTION 4 ---------------------- */}                
             </StyledConatainer>
         </StyledWindow>
@@ -148,23 +158,15 @@ const StyledHeader = styled.View`
     flex-direction:row;
     justify-content:space-between;
     align-items:flex-end;
-    padding: 0 20px;
+    padding: 10px 20px;
 `;
 const StyledHeaderImage = styled(FastImage)`
     width:100px;  
     height:50px;  
     margin-left:10px;
 `;
-const StyledHeaderSubText = styled.Text`
-    padding-bottom: 4px;
-    right:15px;
-`;
-const StyledHeaderSearchIcon = styled(Icon)`
-    font-size:25px;
-    padding-bottom: 4px;
-`;
 const StyledSection = styled.View`
-    margin: 10px 0px;
+    padding: 10px 0px;
     justify-content:center;
 `;
 const StyledSectionHeader = styled.View`
@@ -184,7 +186,7 @@ const StyledHighLight = styled.Text`
     color:#F33562;
 `;
 const StyledSectionContent = styled.View`
-    margin:5px 0;
+    padding:5px 0;
 `;
 const StyledCategoryRow = styled.View`
     flex-direction:row;
@@ -209,27 +211,6 @@ const StyledCategoryText = styled.Text`
     margin:5px 0;
     font-weight:600;
 `;
-
-const StyledNowTemplateView = styled.TouchableOpacity`
-    padding-left:20px;
-`;
-const StyledNowTemplateImage = styled(FastImage)`
-    height:130px;
-    background:black;
-    border-radius:8px;
-`;
-const StyledNowTemplateTitle = styled.Text`
-    font-weight:500;
-    color:#222;
-    padding-top:5px;
-`;
-const StyledNowTemplateSub = styled.Text`
-    font-weight:500;
-    color:#7D7D7D;
-    font-size:12px;
-    padding-top:5px;
-`;
-const StyledNowTemplateCnt = styled.Text`
-    padding-top:5px;
-    font-size:12px;
+const StyledFlatList = styled.FlatList`
+    overflow:visible;
 `;

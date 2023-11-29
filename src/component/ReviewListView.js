@@ -24,7 +24,7 @@ export default React.memo(({data=null, zIndex=-1}) => {
                     return (
                         <StyledSection key={index}>
                             <StyledSectionRow>
-                                <StyledProfileImage source={{uri:item.mb_profile_img}} defaultSource={profile_default} />
+                                <StyledProfileImage source={item.mb_profile_img ? {uri:item.mb_profile_img} : profile_default} defaultSource={profile_default} />
                                 <StyledSectionCol>
                                     <StyledSectionColRow>
                                         <StyledProfileText>{item.mb_nickname}</StyledProfileText>

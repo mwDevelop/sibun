@@ -36,7 +36,7 @@ export default function ReviewAddible(){
                         </StyledItemHeader>
                         <StyledItemContent>
                             <StyledItemImageArea>
-                                <StyledItemImage source={{uri:d.store_main_simg}} defaultSource={onerror} resizeMode="contain"/>
+                                <StyledItemImage source={d.store_main_simg ? {uri:d.store_main_simg} : onerror} defaultSource={onerror} resizeMode="contain"/>
                             </StyledItemImageArea>
                             <StyledItemInfo>
                                 <StyledItemName>{d.store_name}</StyledItemName>

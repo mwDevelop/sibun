@@ -18,7 +18,7 @@ export default React.memo(({src=profile_default, changeHandler=()=>{}, customSty
     //render
     return (
         <StyledImageBox style={customStyle}>
-            <StyledProfileImg source={{uri:src}} defaultSource={profile_default}/>
+            <StyledProfileImg source={src ? {uri:src} : profile_default} defaultSource={profile_default}/>
             <StyledProfileEditButton onPress={() => setUploadOpen(true)}>
                 <StyledProfileEditButtonImage source={photo_edit}/>
             </StyledProfileEditButton>        

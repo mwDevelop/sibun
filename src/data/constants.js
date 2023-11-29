@@ -62,7 +62,7 @@ export const reviewScoreOption = {
     4 : { title: "좋아요" },
     3 : { title: "괜찮아요" },
     2 : { title: "별로에요" },                      
-    1 : { title: "실망헀어요" },                      
+    1 : { title: "실망했어요" },                      
 }
 
 export const reviewTagOption = [

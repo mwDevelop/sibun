@@ -9,7 +9,7 @@ export default function useStoreReview(id){
     const defaultKey = `store_review`;
     const queryKey = [defaultKey];
     queryKey.push('id');
-    queryKey.push(id);      
+    queryKey.push(id);
     const queryUrl = `/store/${id}/review`;
 
     //query

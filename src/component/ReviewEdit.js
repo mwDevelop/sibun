@@ -12,6 +12,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { useMyReviewMutate } from '@/hooks';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ReviewEdit({reservationData=null, reviewData=null}){
@@ -145,7 +146,7 @@ export default function ReviewEdit({reservationData=null, reviewData=null}){
     const photoGear = useMemo(() => {
         const photoList = [...photos];
         return (
-            <StyledSection style={{paddingTop:0}}>
+            <StyledSection style={{paddingTop:0, paddingBottom:100}}>
                 <StyledSectionTitle>사진 업로드({photoList.length}/3)</StyledSectionTitle>
                 <StyledPhotoRow>
                     <StyledPhotoBox style={{width:imageWidth}}>
@@ -194,30 +195,34 @@ export default function ReviewEdit({reservationData=null, reviewData=null}){
 
     //render
     return (
+        <>
         <StyledConatainer>
-            {infoGear}
-            {scoreGear}
-            {tagGear}
-            {textGear}
-            {photoGear}
-            <StyledSubmit>
-                <StyledSubmitButton onPress={saveChk}>작성 완료</StyledSubmitButton>
-            </StyledSubmit>
-            <ImageUpload 
-                open={uploadOpen} 
-                close={() => setUploadOpen(false)} 
-                dataHandler={setPhotos}
-                title="매장 리뷰와 관련된 사진을 올려주세요!" 
-                max={3}
-                size={300}
-            />
-            {confirmGear}
+            <KeyboardAwareScrollView>
+                {infoGear}
+                {scoreGear}
+                {tagGear}
+                {textGear}
+                {photoGear}
+                <ImageUpload 
+                    open={uploadOpen} 
+                    close={() => setUploadOpen(false)} 
+                    dataHandler={setPhotos}
+                    title="매장 리뷰와 관련된 사진을 올려주세요!" 
+                    max={3}
+                    size={300}
+                />
+                {confirmGear}
+            </KeyboardAwareScrollView>
         </StyledConatainer>
+        <StyledSubmit>
+            <StyledSubmitButton onPress={saveChk}>작성 완료</StyledSubmitButton>
+        </StyledSubmit>
+        </>
     )
 }
 
 //------------------------------- STYLE --------------------------------
-const StyledConatainer = styled.View`
+const StyledConatainer = styled.ScrollView`
     flex:1;
     background:white;
 `;
@@ -290,7 +295,8 @@ const StyledTagBox = styled.TouchableOpacity`
     border-width:1px;
     border-color:#222;
     border-radius:50px;
-    padding:5px 8px 4px 8px;  
+    padding:0 5px 0 4px;  
+    height:25px;
     margin-top: 10px;
     margin-right: 10px;
 `;
@@ -302,6 +308,7 @@ const StyledTextArea = styled.TextInput`
     border-radius:5px;
     height:100px;
     padding: 10px;
+    text-align-vertical:top;
 `;
 const StyledTextCnt = styled.Text`
     position:absolute;

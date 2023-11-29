@@ -1,4 +1,4 @@
-package kr.majorworld.suntalk;
+package kr.majorworld.sibun;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

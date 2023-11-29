@@ -12,6 +12,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { alertDefaultSetting } from '@/data/constants';
 import Toast from 'react-native-toast-message';
 import QRCode from 'react-native-qrcode-svg';
+import { rh } from '@/data/globalStyle';
 
 //---------------------------- COMPONENT -------------------------------
 export default function ReservationDesc({route}){
@@ -87,10 +88,10 @@ export default function ReservationDesc({route}){
                         <StyledReservationStatus status={status}>{reservationStatus[status]}</StyledReservationStatus>
                         {
                             status==1 || status==2 ? 
-                            <StyledReservationChange onPress={() => setConfirm(true)}>예약취소</StyledReservationChange> : 
+                            <StyledReservationChange suppressHighlighting={true} onPress={() => setConfirm(true)}>예약취소</StyledReservationChange> : 
                             (
                                 status==5 ? 
-                                <StyledReservationChange onPress={moveStore}>재방문</StyledReservationChange> 
+                                <StyledReservationChange  suppressHighlighting={true} onPress={moveStore}>재방문</StyledReservationChange> 
                                 : null
                             )
                         }
@@ -128,15 +129,19 @@ export default function ReservationDesc({route}){
                         <StyledInfoData>{mobileMask(user.mb_cellphone)}</StyledInfoData>
                     </StyledSectionRow>                                                    
                 </StyledSection>                  
-                <StyledQRBox>
-                    <QRCode 
-                        value={String(reservationId)}
-                        logoSize={40}
-                        logoBackgroundColor='transparent'
-                        color='#333'
-                        size={200}
-                    />
-                </StyledQRBox>
+                {
+                    status == 2 ? ( //Show the QR section only for case reservation confirmed
+                        <StyledQRBox>
+                            <QRCode 
+                                value={String(reservationId)}
+                                logoSize={40}
+                                logoBackgroundColor='transparent'
+                                color='#333'
+                                size={rh * 120}
+                            />
+                        </StyledQRBox>
+                    ) : null
+                }
             </StyledConatainer>
         )
     }, [reservation, user]);

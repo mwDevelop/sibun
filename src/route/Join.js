@@ -185,21 +185,26 @@ export default function Join({route}){
                 <StyledInput 
                     returnKeyType={'done'} 
                     maxLength={13} 
-                    keyboardType='numeric' 
+                    keyboardType="phone-pad"
+                    autoCompleteType="tel"
                     value={mobileMask(phone)} 
                     onChangeText={(text) => 
                     setPhone(numberFilter(text))} 
                     placeholder="휴대폰 번호 입력"
                     placeholderTextColor='#aaa'
                 />
+                <StyledInputBox>
                 <StyledInput 
                     returnKeyType={'done'} 
-                    maxLength={6} 
+                    maxLength={4} 
                     keyboardType='numeric' 
                     value={pin} 
                     onChangeText={(text) => setPin(numberFilter(text))} 
                     placeholder="인증번호" 
                     placeholderTextColor='#aaa'
+                    style={{
+                        letterSpacing: 10,
+                    }}
                 />
                 {
                     phoneChk == "ing" || phoneChk == "certFail" || phoneChk == "isNotCert" ? (
@@ -209,8 +214,7 @@ export default function Join({route}){
                             customStyle={{
                                 position:'absolute',
                                 color:'#FF3A46',
-                                top:'60%',
-                                right:'40%'
+                                right:120
                             }}
                             endEvent = {() => setPhoneChk("certOver")}
                         />                           
@@ -218,7 +222,8 @@ export default function Join({route}){
                 }
                 <StyledInnerButton onPress={() => sendCert(phone)}>
                     <StyledInnerButtonText>인증번호 발송</StyledInnerButtonText>
-                </StyledInnerButton>
+                </StyledInnerButton>                
+                </StyledInputBox>
                 <StyledInputMessage passed={phoneChk == "certPass"}>{phoneChk in globalMsg ? '* '+globalMsg[phoneChk] : ' '}</StyledInputMessage>
             </>
         );
@@ -399,6 +404,7 @@ const StyledFooterNext = styled.TouchableOpacity`
 `;
 const StyledFooterNextText = styled.Text`
     font-size:16px;
+    line-height:33px;
     font-weight:500;
 `;
 const StyledFooterNextIcon = styled(Icon)`
@@ -406,6 +412,9 @@ const StyledFooterNextIcon = styled(Icon)`
     margin-left:10px;
 `;
 const StyledSection = styled.View`
+`;
+const StyledInputBox = styled.View`
+    justify-content:center;
 `;
 const StyledInput = styled.TextInput`
     width:100%;
@@ -438,8 +447,11 @@ const StyledEmailMiddleText = styled.Text`
 const StyledInnerButton = styled.TouchableOpacity`
     background: #fff;
     position:absolute;
-    top:51%;
-    right:5%;
+    top:0;
+    bottom:0;
+    justify-content:center;
+    margin:10px 0;
+    right:15px;
     border-radius:50px;
     padding:10px;
     border-width:1px;

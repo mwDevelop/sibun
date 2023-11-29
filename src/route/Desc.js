@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useStore, useStoreImage, useCoupon, usePriceList, useStoreReview, useUser, useLike, useLikeMutate } from '@/hooks';
-import { ReviewListView, ImageCarousel, CouponSlide } from '@/component';
+import { ReviewListView, ImageCarousel, CouponSlide, CustomLoading } from '@/component';
 import { koreanDay } from '@/data/constants';
 import { numberToTime, mobileMask, setViewedStore, permissionCheck, getDistance } from '@/lib';
 import { star_filled, heart_empty, heart_fill, share } from '@/assets/img';
@@ -14,6 +14,8 @@ import { useRecoilState } from 'recoil';
 import Geolocation from "react-native-geolocation-service";
 import Toast from 'react-native-toast-message';
 import { Linking } from 'react-native';
+import { heart_pop } from '@/assets/animation';
+import AnimatedLoader from "react-native-animated-loader";
 
 //---------------------------- COMPONENT -------------------------------
 export default function Desc({route}){
@@ -28,7 +30,7 @@ export default function Desc({route}){
     //data
     const [storeNew, storeUpdate] = useStore(legacy.store_idx);
     const [imageList] = useStoreImage(legacy.store_idx);
-    const [coupon] = useCoupon(legacy.store_idx, {nowAvailable:true});
+    const [coupon] = useCoupon(legacy.store_idx, {/*nowAvailable:true*/});
     const [priceList] = usePriceList(legacy.store_idx);
     const [review] = useStoreReview(legacy.store_idx);
     const [user] = useUser();
@@ -36,6 +38,7 @@ export default function Desc({route}){
 
     //state
     const [position, setPosition] = useState(positionCache);
+    const [heartPopVisible, setHeartPopVisible] = useState(false);
 
     //function
     const positionUpdate = async() => {
@@ -74,13 +77,25 @@ export default function Desc({route}){
     }; 
 
     const reserve = () => {
-        if(!user) return;
+        if(!user) return Toast.show({ //case not login
+            type: 'bad',
+            text1: '로그인/회원가입 후 예약이 가능합니다.',
+            topOffset: 120,
+            visibilityTime: 1000
+        });
+        if(storeNew?.store_closed_days?.split(',').length > 6) return Toast.show({ //case allday close
+            type: 'bad',
+            text1: '현재 이용할 수 없는 매장입니다.',
+            topOffset: 120,
+            visibilityTime: 1000
+        });
         navigation.navigate('예약', {id:storeNew.store_idx})
     }
 
     const addLike = (storeIdx) => {
         const params = { mb_like_store_idx : storeIdx };
         likeMutation.mutate({type:"add", params:params});                
+        setHeartPopVisible(true);
     }
 
     const removeLike = (likeIdx) => {
@@ -118,7 +133,7 @@ export default function Desc({route}){
         if(!imageList) return;
         const imageData = imageList.length ? imageList.map((i) => i.store_img_data) : [null];
         return (
-            <ImageCarousel data={imageData}/>
+            <ImageCarousel data={imageData} />
         )
     }, [imageList]);
 
@@ -150,6 +165,7 @@ export default function Desc({route}){
                                     zoom : 14
                                 }
                             })}
+                            suppressHighlighting={true}
                         >
                             지도이동<Icon name="chevron-forward-outline" size={13.5}/>
                         </StyledSectionRightButton>
@@ -186,7 +202,7 @@ export default function Desc({route}){
                             <StyledStoreTelBox>
                                 <StyledStoreTelText onPress={callNumber}>{mobileMask(usingData.store_tel || null)}</StyledStoreTelText>
                             </StyledStoreTelBox>
-                            <StyledSectionRightButton onPress={callNumber}>전화하기<Icon name="chevron-forward-outline" size={13.5}/></StyledSectionRightButton>
+                            <StyledSectionRightButton onPress={callNumber} suppressHighlighting={true}>전화하기<Icon name="chevron-forward-outline" size={13.5}/></StyledSectionRightButton>
                         </StyledStoreTelContainer>
                     </StyledSectionRow>
                 </StyledSection>
@@ -293,6 +309,21 @@ export default function Desc({route}){
         </StyledFooter>
     ));
 
+    const heartPopGear = useMemo(() => {
+        if(heartPopVisible) setTimeout(() => setHeartPopVisible(false), 700);
+        else return null;
+
+        return(
+            <AnimatedLoader
+                visible={heartPopVisible}
+                overlayColor="rgba(255,255,255,0)"
+                source={heart_pop}
+                speed={1.5}
+                animationStyle={{height:400, width:400}}
+            />
+        )
+    }, [heartPopVisible]);
+
     //effect
     useLayoutEffect(() => {
         storeUpdate();
@@ -319,6 +350,7 @@ export default function Desc({route}){
                 </StyledBody>
             </StyledScrollContainer>
             {footerGear}
+            {heartPopGear}
         </StyledConatainer>
     )
 }

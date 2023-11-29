@@ -96,65 +96,67 @@ export default React.memo(({ title = "근처 매장 목록 보기", list = [] })
                         ) : null
                     }
                 </StyledHeader>
-                <StyledContent showsVerticalScrollIndicator={false}>
-                    {
-                        !orderedList ? null : (
-                            !orderedList.length ? <StyledEmpty>매장이 검색되지 않았습니다.</StyledEmpty> : (
-                                orderedList.map((d, i) => {
+                {
+                    !orderedList ? null : (
+                        !orderedList.length ? <StyledEmpty>매장이 검색되지 않았습니다.</StyledEmpty> : (
+                            <StyledFlatList 
+                                keyExtractor={(item) => item.store_idx}
+                                showsVerticalScrollIndicator={false}
+                                data={orderedList}
+                                renderItem= {({item}) => {
                                     //add extra tags
-                                    const tags = d.store_amenities.split(',');
+                                    const tags = item.store_amenities.split(',');
                                     //available tag
                                     if(
-                                        Number(d.store_open_time) < now && 
-                                        Number(d.store_close_time)-2 > now && //set 60 minutes(minimum usage) before until closed
-                                        !(d.store_closed_days.split(',').includes(String(td)))
+                                        Number(item.store_open_time) < now && 
+                                        Number(item.store_close_time)-2 > now && //set 60 minutes(minimum usage) before until closed
+                                        !(item.store_closed_days.split(',').includes(String(td)))
                                     ) tags.unshift('즉시가능');
                                     //voucher tag
-                                    if(d.store_voucher_use_yn == 'y') tags.unshift('할인중');
-        
+                                    if(item.store_voucher_use_yn == 'y') tags.unshift('할인중');                                    
                                     return (
-                                        <StyledItem key={i}>
-                                            <StyledItemImageArea onPress={() => navigation.navigate('Desc', d)}>
-                                                <StyledItemImage source={{uri:d.store_main_simg}} resizeMode="cover" defaultSource={onerror}/>
+                                        <StyledItem>
+                                            <StyledItemImageArea onPress={() => navigation.navigate('Desc', item)}>
+                                                <StyledItemImage source={item.store_main_simg ? {uri:item.store_main_simg} : onerror} resizeMode="cover" defaultSource={onerror}/>
                                             </StyledItemImageArea>
                                             <StyledItemInfo>
                                                 {
                                                     tags.length?(
                                                         <StyledInfoRow>
-                                                            {tags.map((text, index) => (
-                                                                text && index < 3 ? 
-                                                                (<StyledInfoTag key={index} highligth={text=="할인중" || text=="즉시가능"}>{text}</StyledInfoTag>) : 
-                                                                (index==3 ? <StyledInfoTagCount key={index}>+{tags.length - 3}</StyledInfoTagCount> : null)
+                                                            {tags.map((text, i) => (
+                                                                text && i < 3 ? 
+                                                                (<StyledInfoTag key={i} highligth={text=="할인중" || text=="즉시가능"}>{text}</StyledInfoTag>) : 
+                                                                (i==3 ? <StyledInfoTagCount key={i}>+{tags.length - 3}</StyledInfoTagCount> : null)
                                                             ))}
                                                         </StyledInfoRow>
                                                     ): null
                                                 }
                                                 <StyledInfoRow>
-                                                    <StyledInfoTitle suppressHighlighting={true} onPress={() => navigation.navigate('Desc', d)}>{d.store_name}</StyledInfoTitle>
+                                                    <StyledInfoTitle suppressHighlighting={true} onPress={() => navigation.navigate('Desc', item)}>{item.store_name}</StyledInfoTitle>
                                                 </StyledInfoRow>
                                                 <StyledInfoRow>
                                                     <StyledInfoReviewStarArea>
                                                         <StyledInfoReviewStar source={star_filled}/>
                                                         <StyledInfoReviewScore>
-                                                            {Number(d.store_review_avg).toFixed(1)}
+                                                            {Number(item.store_review_avg).toFixed(1)}
                                                         </StyledInfoReviewScore>
                                                     </StyledInfoReviewStarArea>
                                                     <StlyedInfoReviewTextArea>
-                                                        <StyledInfoReviewCount>리뷰 {d.store_review_cnt}개</StyledInfoReviewCount>
+                                                        <StyledInfoReviewCount>리뷰 {item.store_review_cnt}개</StyledInfoReviewCount>
                                                         <Icon name="chevron-forward" size={15}/>
                                                     </StlyedInfoReviewTextArea>
                                                 </StyledInfoRow>
                                                 <StyledInfoRow>
-                                                    <StyledInfoAddr>{d.store_addr}</StyledInfoAddr>
+                                                    <StyledInfoAddr>{item.store_addr}</StyledInfoAddr>
                                                 </StyledInfoRow>
                                             </StyledItemInfo>
-                                        </StyledItem>
-                                    )
-                                })                                
-                            )
-                        )  
-                    }
-                </StyledContent>
+                                        </StyledItem>  
+                                    );
+                                }}
+                            />
+                        )
+                    )
+                }
             </StyledContainer>
         );
     }, [orderedList, title, order]);
@@ -203,6 +205,10 @@ const StyledFilterText = styled.Text`
     font-weight:400;
 `;
 const StyledContent = styled.ScrollView`
+    margin-top:10px;
+    margin-bottom:30px;
+`;
+const StyledFlatList = styled.FlatList`
     margin-top:10px;
     margin-bottom:30px;
 `;

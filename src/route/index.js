@@ -32,6 +32,4 @@ export { default as ReservationDesc } from "./ReservationDesc";
 /*-----------------------------------------------------------*/
 export { default as PermissionCard} from "./PermissionCard";
 /*-----------------------------------------------------------*/
-export { default as ModalGroup} from "./ModalGroup";
-/*-----------------------------------------------------------*/
 export { default as NetworkError} from "./NetworkError";

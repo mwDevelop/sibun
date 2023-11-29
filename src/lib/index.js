@@ -16,3 +16,5 @@ export { default as textCut } from "./textCut";
 export { default as getDistance } from "./getDistance";
 export { default as uniquePush } from "./uniquePush";
 export { default as setViewedStore } from "./setViewedStore";
+export { default as setDeviceToken } from "./setDeviceToken";
+export { default as pushNoti } from "./pushNoti";

@@ -68,8 +68,8 @@ export default React.memo(({open = false, close=()=>{}, dataHandler=() => {}, ti
             </StyledHeader>
             <StyledTitle>{title}</StyledTitle>
             <StyledBody>
-                <StyledCameraButton onPress={connectCamera}>사진 찍기</StyledCameraButton>
-                <StyledAlbumButton onPress={connectAlbum}>사진 선택</StyledAlbumButton>
+                <StyledCameraButton suppressHighlighting={true} onPress={connectCamera}>사진 찍기</StyledCameraButton>
+                <StyledAlbumButton suppressHighlighting={true} onPress={connectAlbum}>사진 선택</StyledAlbumButton>
             </StyledBody>
         </StyledModal>
     )

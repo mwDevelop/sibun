@@ -33,8 +33,8 @@ export default function useCoupon(id, params={}){
                 listData.sort((p, n) => -(p.store_voucher_discount_rate - n.store_voucher_discount_rate)); //sort by discount rate (DESC)
                 return listData;
             }else{
-                console.log(queryKey);
-                console.log(res.data.result);
+                //console.log(queryKey);
+                //console.log(res.data.result);
                 return null;
             }
         }),

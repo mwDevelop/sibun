@@ -23,7 +23,6 @@ export default async function permissionCheck(type, onlyChk = false){
     try{
         const os = Platform.OS;
         const version = Platform.Version;
-        console.log(version);
         const options = {
             'ios' : {
                 'location' : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,

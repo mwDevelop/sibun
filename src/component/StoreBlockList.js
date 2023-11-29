@@ -75,7 +75,7 @@ export default React.memo(({list=[]}) => {
                                 const likeFlag = likeList.includes(item.store_idx);
                                 return (
                                     <StyledItem key={index}>
-                                        <StyledImage source={{uri:item.store_main_simg}} defaultSource={onerror} />
+                                        <StyledImage source={item.store_main_simg ? {uri:item.store_main_simg} : onerror} defaultSource={onerror} />
                                         <StyledLikeTouch onPress={() => likeFlag ? removeLike(item.store_idx) : addLike(item.store_idx)}>
                                             <StyledLikeIcon source={ likeFlag ? heart_flat_fill : heart_flat_empty} resizeMode='contain'/>
                                         </StyledLikeTouch>

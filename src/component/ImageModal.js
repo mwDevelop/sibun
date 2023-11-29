@@ -15,7 +15,6 @@ export default function ImageModal({data = null, close = () => {console.log("clo
             </StyledContainer>
             <StyledCloseButton name="close-outline" onPress={close} suppressHighlighting={true}/>
         </StyledModal>
-        
     );
 }
 

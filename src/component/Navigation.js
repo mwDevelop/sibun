@@ -1,6 +1,6 @@
 //------------------------------ MODULE --------------------------------
-import { useState, useEffect, useLayoutEffect } from 'react';
-import { Text, View, Image, SafeAreaView } from 'react-native';
+import { useState, useLayoutEffect } from 'react';
+import { Text, Image, SafeAreaView } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -34,12 +34,10 @@ import {
     ReviewDesc,
     RecentList,
     LikeList,
-    ModalGroup,
     NetworkError 
-} from '@/route';
+} from '@/route'; //need to consider lazy (ordering tab and stack groups...?)
 import { firstLaunch } from '@/lib';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { TransitionPresets } from '@react-navigation/stack';
 import { ProfileEditSaveAtom } from '@/data/global';
 import { useRecoilState } from "recoil";
 import { home_gray, home_color, location_gray, location_color, document_gray, document_color, person_gray, person_color } from '@/assets/img';
@@ -86,7 +84,7 @@ const ContentTab = () => {
                 tabBarIcon: ({focused}) => <Image source={r.route.params.icon[focused ? 1 : 0]} style={r.route.params.style || {height:rh*28, width:rw*24}} resizeMode='contain'/>,
                 headerShown: false, 
                 headerTitleAlign: 'center',
-                tabBarStyle: { height: 70, paddingBottom: 20 },
+                tabBarStyle: { height: 70, paddingBottom: rh*10 },
                 headerTitleStyle: {
                     fontSize:18,
                     fontWeight:600
@@ -136,7 +134,7 @@ const ReviewTab = () => {
                 backgroundColor:'#fff',
             }}
             screenOptions={{   
-                tabBarStyle:{paddingTop:15, marginRight:20, marginLeft:20},
+                tabBarStyle:{paddingTop:15, marginRight:20, marginLeft:20, elevation:0},
                 tabBarPressColor: 'transparent',
                 tabBarActiveTintColor: '#222',
                 tabBarInactiveTintColor: '#7D7D7D',
@@ -234,16 +232,6 @@ const RootStack = () => {
             <Stack.Screen name="내 리뷰 상세보기" component={ReviewDesc} options={{headerShown:true}}/>
             <Stack.Screen name="최근 본 매장" component={RecentList} options={{headerShown:true}}/>
             <Stack.Screen name="찜한 매장" component={LikeList} options={{headerShown:true}}/>
-            {/**************************** MODAL *****************************/}
-            <Stack.Screen
-                name="ModalGroup"
-                component={ModalGroup}
-                options={{
-                    gestureEnabled: true,
-                    ...TransitionPresets.ModalPresentationIOS,
-                    presentation:'transparentModal',
-                }}
-            />
             {/***************************** ETC ******************************/}
             <Stack.Screen name="NetworkError" component={NetworkError}/>
         </Stack.Navigator>

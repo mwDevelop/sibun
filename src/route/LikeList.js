@@ -1,7 +1,7 @@
 //------------------------------ MODULE --------------------------------
 import styled from 'styled-components/native';
 import { useState, useLayoutEffect } from 'react';
-import { StoreBlock } from '@/component';
+import { StoreBlockList } from '@/component';
 import { apiCall } from '@/lib';
 
 //---------------------------- COMPONENT -------------------------------
@@ -21,7 +21,7 @@ export default function LikeList(){
     //render
     return (
         <StyledConatainer>
-            <StoreBlock list={list ? list.map((d) => d.mb_like_store_idx) : []} />
+            <StoreBlockList list={list ? list.map((d) => d.mb_like_store_idx) : []} />
         </StyledConatainer>
     )
 }

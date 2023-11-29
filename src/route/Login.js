@@ -52,24 +52,28 @@ export default function Login({route}){
 
     const buttonGear  = useMemo(() => {
         const buttonList = [
+            /*
             {
                 icon : <MaIcon name='chat' color="#351209" size={33}/>,
                 background: '#FFEF61',
                 img: login_kakao,
                 event: () => Toast.show(errorToast)
             },
+            */
             {
                 icon : <MaIcon name='cellphone' size={40}/>,
                 background: 'white',
                 img: login_mobile,
                 event: () => navigation.navigate("로그인 / 회원가입", {page: 0, finalDestination: afterLoginPage || 'Content'})
             },
+            /*
             Platform.OS === "ios" ? {
                 icon : <MaIcon name='apple' color="white" size={33}/>,
                 background: '#333',
                 img: login_apple,
                 event: () => Toast.show(errorToast)
             } : null,              
+            */
         ]
 
         return (
@@ -108,7 +112,7 @@ export default function Login({route}){
                 <StyledContentButton>
                     {buttonGear}
                 </StyledContentButton>
-                {extraGear}
+                {/*extraGear*/}
             </StyledContentSection>
         </StyledConatainer>
     )

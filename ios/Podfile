@@ -24,6 +24,13 @@ end
 target 'suntalk' do
   config = use_native_modules!
 
+  # firebase module install
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseMessaging', :modular_headers => true
+
   # 네이버 맵 연동
   pod 'NMapsMap','3.10.1'
 

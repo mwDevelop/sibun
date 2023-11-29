@@ -1,6 +1,6 @@
 //------------------------------ MODULE --------------------------------
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { apiCall } from '@/lib';
+import { apiCall, setDeviceToken } from '@/lib';
 
 //----------------------------- FUNCTION -------------------------------
 export default async function login(phone){
@@ -10,6 +10,10 @@ export default async function login(phone){
     if(loginTryResult.data.result == "000"){ //LOGIN
         AsyncStorage.setItem('access', loginTryResult.data.access_token);
         AsyncStorage.setItem('refresh', loginTryResult.data.refresh_token);
+
+        //set device tokne for push alert
+        setDeviceToken();
+
         return "success";
     }else if(loginTryResult.data.result == "001") return "join"; //JOIN
     else return "error"; //ERROR

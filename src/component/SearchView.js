@@ -42,7 +42,7 @@ export default React.memo(({keyword = null}) => {
 const StyledConatainer = styled.View`
     height:100%;
     width:100%;
-    top:-50px;
+    top:-55px;
     background:white;
     position:absolute;
     z-index:101;

@@ -79,6 +79,7 @@ export default function Mypage(){
                 title: "최근 본 매장",
                 link: "최근 본 매장"
             },
+            /*
             {
                 title: "매장 히스토리",
                 link: "home"
@@ -103,6 +104,7 @@ export default function Mypage(){
                 title: "앱 이용안내",
                 link: "home"
             },
+            */
             {
                 title: "회원탈퇴",
                 link: "회원탈퇴"
@@ -162,7 +164,7 @@ export default function Mypage(){
                     <StyledFooter>
                         <StyledLogout>
                             <StyledLogoutIcon name="ios-exit-outline"/>
-                            <StyledLogoutText onPress={() => {setLogoutAlert(true)}}> 로그아웃</StyledLogoutText>
+                            <StyledLogoutText onPress={() => {setLogoutAlert(true)}} suppressHighlighting={true}> 로그아웃</StyledLogoutText>
                         </StyledLogout>
                     </StyledFooter>
             </StyledConatainer>

@@ -38,6 +38,14 @@ export default function Search({route}){
     const [searchText, setSearchText] = useState('');
     const [keyword, setKeyword] = useState('');
 
+    //function 
+    const closeSearch = () => {
+        setSearchFocus(false); 
+        searchBarRef.current.blur(); 
+        setSearchText(null);
+        setKeyword(null);
+    };
+
     //memo
     const searchGear = useMemo(() => {
         Animated.timing(searchBarWidth, {
@@ -47,12 +55,6 @@ export default function Search({route}){
         }).start();            
         
         const searchSubmit = () => setKeyword(searchText);
-        const closeSearch = () => {
-            setSearchFocus(false); 
-            searchBarRef.current.blur(); 
-            setSearchText(null);
-            setKeyword(null);
-        };
         const openSearch = () => setSearchFocus(true);
 
         return (
@@ -108,6 +110,7 @@ export default function Search({route}){
     }, [cateObj, cateSelect]);
 
     const mapGear = useMemo(() => {
+        if(targetStore && searchFocus) closeSearch(); //execute closing method only in case view already opened
         return (
             <MapView markerData={markerData || []} onCenterChange={setCenter} listOpen={setStoreListOpen} targetStore={targetStore}/>
         );
@@ -212,7 +215,6 @@ export default function Search({route}){
                 }
             });
         }catch(e){
-            console.log('this error');
             console.log(e);
         }
     }, [center, like]);     
@@ -306,6 +308,6 @@ const StyledListModal = styled(Modal)`
     border-top-right-radius:25px;
     border-top-left-radius:25px;
     height:600px;
-    margin-top:20px;
+    margin-top:25%;
     overflow:hidden;
 `;

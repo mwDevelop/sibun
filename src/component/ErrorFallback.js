@@ -13,8 +13,8 @@ export default function ErrorFallback(){
                 <StyledTitle>문제가 발생 하였습니다!</StyledTitle>
                 <StyledSub>홈으로 버튼을 눌러 다시 실행 해 주세요.</StyledSub>
             </StyledMessage>
-            <StyledButton>
-                <StyledButtonText onPress={() => RNRestart.restart()}>홈 으 로</StyledButtonText>
+            <StyledButton onPress={() => RNRestart.restart()}>
+                <StyledButtonText>홈 으 로</StyledButtonText>
             </StyledButton>
         </StyledConatainer>        
     )
