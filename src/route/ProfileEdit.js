@@ -163,7 +163,7 @@ export default function ProfileEdit(){
         return(
             <StyledSection>
                 <StyledSectionTitle>휴대폰번호</StyledSectionTitle>
-                <StyledInput maxLength={13} returnKeyType={'done'} keyboardType='numeric' value={mobileMask(phone)} onChangeText={(text) => setPhone(numberFilter(text))} />
+                <StyledInput autoComplete="tel" maxLength={13} returnKeyType={'done'} keyboardType='numeric' value={mobileMask(phone)} onChangeText={(text) => setPhone(numberFilter(text))} />
                 <StyledInputBox>
                 <StyledInput maxLength={6} returnKeyType={'done'} keyboardType='numeric' value={pin} onChangeText={(text) => setPin(numberFilter(text))} />
                 {
@@ -312,15 +312,10 @@ export default function ProfileEdit(){
         } 
     }, [name, gender, birth, mailFront, mailRear, savePhone]);
     
-
     //render
     return(
-        <StyledWindow>
+        <StyledWindow enableOnAndroid>
             <StyledConatainer>
-                <KeyboardAwareScrollView 
-                    extraHeight={90}
-                    enableOnAndroid={true}
-                >
                     {profileImgGear}
                     {nameGear}
                     {genderGear}
@@ -328,14 +323,13 @@ export default function ProfileEdit(){
                     {emailGear}
                     {phoneGear}
                     {dateModalGear}
-                </KeyboardAwareScrollView>
             </StyledConatainer>                
         </StyledWindow>
     );
 }
 
 //------------------------------- STYLE --------------------------------
-const StyledWindow = styled.ScrollView`
+const StyledWindow = styled(KeyboardAwareScrollView)`
     background-color:#fff;
     flex:1;
 `;

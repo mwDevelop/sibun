@@ -10,34 +10,26 @@ export default async function setDeviceToken(){
 	//ANDROID : authorized default for android
 	//IOS : including push permission 
   	const authStatus = await messaging().requestPermission();
-  	const enabled = (
+  	let enabled = (
 		authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
 		authStatus === messaging.AuthorizationStatus.PROVISIONAL
   	);
 
-	//push permission for android
-	if (Platform.OS == "android") requestNotifications(["alert", "sound"]);
+	//push permission filter for android
+	if (Platform.OS == "android"){
+		const androidRes = await requestNotifications(["alert", "sound"]);
+		enabled = (androidRes.status == "granted");
+	};
 
-	//set device code in server 
+	//get device token
 	const headers = {"Authorization" : "access"};
-  	if(enabled) {
-		await messaging()
-			.getToken()
-			.then(fcmToken => {
-				const params = {"mb_device_token" : fcmToken};
-				apiCall.post(`/user/me`, {...params}, {headers})
-					.then((r) => {
-						if(r.data.result != "000" && r.data.result != "001") console.log(r.data); //api error
-					})
-					.catch((e) => console.log(e)); //network error
-			})
-			.catch(e => console.log('error: ', e));
-  	}else{
-		const params = {"mb_device_token" : ''}; //make token empty
-		apiCall.post(`/user/me`, {...params}, {headers})
-			.then((r) => {
-				if(r.data.result != "000" && r.data.result != "001") console.log(r.data); //api error
-			})
-			.catch((e) => console.log(e)); //network error
-	}
+	const tokenValue = enabled ? await messaging().getToken() : '';
+	const params = {"mb_device_token" : tokenValue};
+
+	//set device token in server
+	apiCall.post(`/user/me`, {...params}, {headers})
+		.then((r) => {
+			if(r.data.result != "000" && r.data.result != "001") console.log(r.data); //api error
+		})
+		.catch((e) => console.log(e)); //network error	
 }

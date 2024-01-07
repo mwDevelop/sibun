@@ -186,7 +186,7 @@ export default function Join({route}){
                     returnKeyType={'done'} 
                     maxLength={13} 
                     keyboardType="phone-pad"
-                    autoCompleteType="tel"
+                    autoComplete="tel"
                     value={mobileMask(phone)} 
                     onChangeText={(text) => 
                     setPhone(numberFilter(text))} 

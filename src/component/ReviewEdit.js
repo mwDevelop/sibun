@@ -196,8 +196,7 @@ export default function ReviewEdit({reservationData=null, reviewData=null}){
     //render
     return (
         <>
-        <StyledConatainer>
-            <KeyboardAwareScrollView>
+        <StyledConatainer enableOnAndroid>            
                 {infoGear}
                 {scoreGear}
                 {tagGear}
@@ -212,7 +211,6 @@ export default function ReviewEdit({reservationData=null, reviewData=null}){
                     size={300}
                 />
                 {confirmGear}
-            </KeyboardAwareScrollView>
         </StyledConatainer>
         <StyledSubmit>
             <StyledSubmitButton onPress={saveChk}>작성 완료</StyledSubmitButton>
@@ -222,7 +220,7 @@ export default function ReviewEdit({reservationData=null, reviewData=null}){
 }
 
 //------------------------------- STYLE --------------------------------
-const StyledConatainer = styled.ScrollView`
+const StyledConatainer = styled(KeyboardAwareScrollView)`
     flex:1;
     background:white;
 `;
@@ -299,8 +297,10 @@ const StyledTagBox = styled.TouchableOpacity`
     height:25px;
     margin-top: 10px;
     margin-right: 10px;
+    justify-content:center;
 `;
 const StyledTagText = styled.Text`
+    line-height:19px;
 `;
 const StyledTextArea = styled.TextInput`
     border-width:1px;
