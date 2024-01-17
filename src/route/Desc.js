@@ -121,9 +121,14 @@ export default function Desc({route}){
                             </StyledIconTouch>
                         ) : null
                     }
-                    <StyledIconTouch>
-                        <StyledShareIcon source={share} resizeMode="contain"/>                      
-                    </StyledIconTouch>
+                    {
+                        /*
+                        <StyledIconTouch>
+                            <StyledShareIcon source={share} resizeMode="contain"/>                      
+                        </StyledIconTouch>                    
+                        */
+                    }
+
                 </StyledHeaderRight>
             </StyledHeader>
         );
